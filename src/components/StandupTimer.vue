@@ -10,11 +10,14 @@
           v-model.number="secsPerPerson"
           dense
           outlined
-          :min="10"
-          :max="300"
           label="Seconds per person"
           class="col-2"
-        ></q-input>
+          :readonly="!secsEditable"
+        >
+          <q-tooltip v-if="!secsEditable"
+            >Clear attendants list to modify this again</q-tooltip
+          ></q-input
+        >
         <q-input
           v-model="newName"
           dense
@@ -28,6 +31,9 @@
           </template>
         </q-input>
         <q-checkbox v-model="doCapitalize" dense label="Capitalize first letter"></q-checkbox>
+
+        <q-space> </q-space>
+        <q-btn icon="delete" label="Reset" @click="resetData()"> </q-btn>
       </section>
     </q-card-section>
 
@@ -39,62 +45,76 @@
       <q-separator></q-separator>
 
       <section class="q-mt-md">
+        <!-- TODO - resolve leave transition -->
         <draggable :list="attendants" item-key="name">
           <template #item="{ element, index }">
-            <attendant-view
-              :attendant="element"
-              @remove="removeAttendant(index)"
-              class="q-ml-md"
-            ></attendant-view>
+            <transition
+              appear
+              enter-active-class="animated zoomIn slow"
+              leave-active-class="animated zoomOut slow"
+            >
+              <q-linear-progress
+                :value="1 - element.timeLeft / secsPerPerson"
+                size="3rem"
+                color="primary"
+                animation-speed="900"
+                rounded
+                class="q-mt-sm"
+              >
+                <div :key="index" class="absolute-full flex flex-center row">
+                  <div class="col-12 row items-center q-px-md">
+                    <q-badge color="grey-6" class="text-white text-subtitle1">{{
+                      element.name
+                    }}</q-badge>
+                    <q-space></q-space>
+                    <q-chip
+                      v-if="element.isFinished || index == selectedAttendantIndex"
+                      square
+                      size="md"
+                      :label="secondsToFormatted(element.timeLeft)"
+                    />
+                    <q-space></q-space>
+                    <q-btn
+                      round
+                      dense
+                      icon="close"
+                      color="grey-6"
+                      text-color="white"
+                      @click="removeAttendant(index)"
+                    ></q-btn>
+                  </div>
+                </div>
+              </q-linear-progress>
+            </transition>
           </template>
         </draggable>
       </section>
     </q-card-section>
 
     <q-card-section id="controls" v-if="attendants.length > 0">
-      <span class="text-h6">Now talking</span>
       <q-separator></q-separator>
 
-      <section v-if="progressValue != undefined" class="q-mt-md">
-        <span class="text-h6 row items-center justify-center"
-          >{{ activeAttendant?.name }}'s slot</span
-        >
-        <q-linear-progress
-          :value="progressValue"
-          size="3rem"
-          :color="progressColor"
-          animation-speed="900"
-        >
-          <div class="absolute-full flex flex-center">
-            <q-chip
-              v-if="activeAttendant"
-              square
-              size="md"
-              :label="secondsToFormatted(activeAttendant?.timeLeft)"
-            />
-          </div>
-        </q-linear-progress>
-      </section>
-
       <section class="q-mt-md row items-center justify-center">
-        <q-btn
-          v-if="clockTicking"
-          icon="pause"
-          label="Pause"
-          :disable="attendants.length == 0"
-          size="md"
-          @click="doPause()"
-          class="col-3"
-        ></q-btn>
-        <q-btn
-          v-else
-          icon="play_arrow"
-          label="Start/Resume"
-          :disable="attendants.length == 0"
-          size="md"
-          @click="doPlay()"
-          class="col-3"
-        ></q-btn>
+        <template v-if="attendants.some((a) => !a.isFinished)">
+          <q-btn
+            v-if="clockTicking"
+            icon="pause"
+            label="Pause"
+            :disable="attendants.length == 0"
+            size="md"
+            @click="doPause()"
+            class="col-3"
+          ></q-btn>
+          <q-btn
+            v-else
+            icon="play_arrow"
+            label="Start/Resume"
+            :disable="attendants.length == 0"
+            size="md"
+            @click="doResume()"
+            class="col-3"
+          ></q-btn>
+        </template>
         <q-btn
           v-if="nextIndex > -1"
           icon="navigate_next"
@@ -106,7 +126,14 @@
         ></q-btn>
       </section>
     </q-card-section>
-    {{ attendants }}
+    <q-card-section v-if="attendants.length > 0 && !attendants.some((a) => !a.isFinished)">
+      <section id="summary" class="row items-center text-h6 column">
+        <span>Everyone finished!</span>
+        <span>
+          Total time taken: <q-chip square>{{ secondsToFormatted(totalTime()) }} </q-chip>
+        </span>
+      </section>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -115,10 +142,12 @@ import { computed, ref } from 'vue';
 import { Attendant, newAttendant } from './AttendantModel';
 
 import draggable from 'vuedraggable';
-import AttendantView from './AttendantView.vue';
 import { Notify } from 'quasar';
 
-const secsPerPerson = ref<number>(5);
+const DEFAULT_SECS = 5;
+
+const secsEditable = ref(true);
+const secsPerPerson = ref<number>(DEFAULT_SECS);
 
 const newName = ref<string>('');
 
@@ -130,6 +159,7 @@ const clockTicking = ref(false);
 
 const addNewAttendant = () => {
   if (newName.value.length == 0) return;
+  secsEditable.value = false;
   let name = newName.value;
   if (doCapitalize.value) {
     name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -140,6 +170,9 @@ const addNewAttendant = () => {
 
 const removeAttendant = (index: number) => {
   attendants.value.splice(index, 1);
+  if (attendants.value.length == 0) {
+    secsEditable.value = true;
+  }
 };
 
 const secondsToFormatted = (val: number) => {
@@ -153,35 +186,22 @@ const secondsToFormatted = (val: number) => {
   return `${sign}${minutes}:${seconds}`;
 };
 
-const activeIndex = ref(-1);
+const selectedAttendantIndex = ref(-1);
 
-const activeAttendant = computed<Attendant | undefined>(() => {
+const selectedAttendant = computed<Attendant | undefined>(() => {
   if (attendants.value.length == 0) return undefined;
-  if (activeIndex.value < 0) return undefined;
-  return attendants.value[activeIndex.value];
+  if (selectedAttendantIndex.value < 0) return undefined;
+  return attendants.value[selectedAttendantIndex.value];
 });
 
 const doTick = () => {
   setTimeout(() => {
     if (!clockTicking.value) return;
-    const activeAtt = activeAttendant.value;
-    if (!activeAtt) return;
-    activeAtt.timeLeft -= 1;
+    if (!selectedAttendant.value) return;
+    selectedAttendant.value.timeLeft -= 1;
     doTick();
   }, 1000);
 };
-
-const progressValue = computed(() => {
-  const attendant = activeAttendant.value;
-  if (!attendant) return undefined;
-  return 1 - attendant.timeLeft / secsPerPerson.value;
-});
-
-const progressColor = computed(() => {
-  const attendant = activeAttendant.value;
-  if (!attendant) return undefined;
-  return attendant.timeLeft >= 0 ? 'info' : 'warning';
-});
 
 const doPause = () => {
   clockTicking.value = false;
@@ -192,22 +212,66 @@ const nextIndex = computed(() => {
   return attendants.value.findIndex((att) => !att.isFinished);
 });
 
-const doPlay = () => {
-  if (nextIndex.value < 0) {
-    Notify.create({ type: 'info', message: 'No more people to talk.' });
+const nextAttendant = computed(() => {
+  if (nextIndex.value < 0) return undefined;
+  return attendants.value[nextIndex.value];
+});
+
+const doResume = () => {
+  if (selectedAttendantIndex.value > -1) {
+    clockTicking.value = true;
+    doTick();
     return;
   }
-  activeIndex.value = nextIndex.value;
-  clockTicking.value = true;
-  doTick();
+
+  if (nextIndex.value > -1) {
+    Notify.create({ type: 'info', message: `${nextAttendant.value?.name} talks NOW! :)` });
+    setTimeout(() => {
+      selectedAttendantIndex.value = nextIndex.value;
+      clockTicking.value = true;
+      doTick();
+    }, 1000);
+  }
 };
 
 const doNext = () => {
-  if (activeIndex.value > -1) {
-    attendants.value[activeIndex.value].isFinished = true;
-    activeIndex.value = -1;
+  clockTicking.value = false;
+
+  // finish currently talking name
+  if (selectedAttendantIndex.value > -1) {
+    attendants.value[selectedAttendantIndex.value].isFinished = true;
+    selectedAttendantIndex.value = -1;
   }
-  if (nextIndex.value < 0) return;
-  activeIndex.value = nextIndex.value;
+
+  // start next name if applicable
+  if (nextIndex.value > -1) {
+    Notify.create({ type: 'info', message: `${nextAttendant.value?.name} talks NOW! :)` });
+    setTimeout(() => {
+      selectedAttendantIndex.value = nextIndex.value;
+      clockTicking.value = true;
+      doTick();
+    }, 1000);
+    return;
+  }
+
+  Notify.create({ type: 'positive', message: 'All done!' });
+};
+
+const totalTime = () => {
+  return attendants.value
+    .map((att) =>
+      att.timeLeft < 0
+        ? Math.abs(att.timeLeft) + secsPerPerson.value
+        : secsPerPerson.value - att.timeLeft
+    )
+    .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+};
+
+const resetData = () => {
+  secsEditable.value = true;
+  secsPerPerson.value = DEFAULT_SECS;
+  newName.value = '';
+  doCapitalize.value = true;
+  attendants.value = [];
 };
 </script>
