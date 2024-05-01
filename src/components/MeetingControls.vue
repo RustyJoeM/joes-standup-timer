@@ -100,7 +100,7 @@ const doNext = () => {
 
   // start next person if applicable
   if (nextAttendantIndex.value > -1) {
-    notifyMessage('info', `${nextAttendant.value?.name} talks NOW! :)`);
+    notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
     activeAttendantIndex.value = nextAttendantIndex.value;
     startTicker();
     return;
