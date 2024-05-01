@@ -6,5 +6,6 @@
   "editor.codeActionsOnSave": ["source.fixAll.eslint"],
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["vuedraggable"]
+  "prettier.printWidth": 120,
+  "cSpell.words": ["pinia", "vuedraggable"]
 }
