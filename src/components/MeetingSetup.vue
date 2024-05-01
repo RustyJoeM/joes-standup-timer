@@ -1,8 +1,8 @@
 <template>
-  <section class="q-pa-sm">
+  <section>
     <span class="text-h6">Meeting setup</span>
 
-    <section class="q-mt-md row q-gutter-x-md">
+    <section class="q-mt-md q-ml-md row">
       <q-input
         type="number"
         :min="MIN_TALK_TIME_MS / 1000"
@@ -22,25 +22,19 @@
         outlined
         label="Add name"
         @keyup.enter="addNewAttendant()"
-        class="col-3"
+        class="q-ml-md col-3"
       >
         <template #append>
-          <q-btn flat icon="add" @click="addNewAttendant()"></q-btn>
+          <q-btn dense flat icon="add" @click="addNewAttendant()"></q-btn>
         </template>
       </q-input>
 
-      <q-checkbox v-model="doCapitalize" dense label="Capitalize first letter"></q-checkbox>
-
-      <q-btn
-        v-if="attendants.length > 1"
-        icon="shuffle"
-        label="Shuffle"
-        @click="doShuffle()"
-      ></q-btn>
-
-      <q-space></q-space>
-
-      <q-btn icon="delete" label="Clear" @click="clearAttendants()"> </q-btn>
+      <q-checkbox
+        v-model="doCapitalize"
+        dense
+        label="Capitalize first letter"
+        class="q-ml-md"
+      ></q-checkbox>
     </section>
   </section>
 </template>
@@ -51,8 +45,8 @@ import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { MIN_TALK_TIME_MS } from './AttendantModel';
 
-const { msPerAttendant, attendants } = storeToRefs(useMeetingStore());
-const { addAttendant, shuffleAttendants } = useMeetingStore();
+const { msPerAttendant } = storeToRefs(useMeetingStore());
+const { addAttendant } = useMeetingStore();
 
 const addNewAttendant = () => {
   if (newName.value.length == 0) return;
@@ -80,14 +74,4 @@ const doCapitalize = ref(true);
 defineProps<{
   meetingStarted: boolean;
 }>();
-
-const clearAttendants = () => {
-  newName.value = '';
-  doCapitalize.value = true;
-  attendants.value = [];
-};
-
-const doShuffle = () => {
-  shuffleAttendants();
-};
 </script>

@@ -1,43 +1,33 @@
 <template>
-  <q-card-section id="controls" v-if="attendants.length > 0">
-    <q-separator></q-separator>
+  <section class="column justify-end">
+    <q-btn v-if="tickerId" icon="pause" :label="pauseLabel" size="lg" @click="doPause()"></q-btn>
+    <q-btn
+      v-if="!tickerId && activeAttendant"
+      icon="play_arrow"
+      :label="playLabel"
+      :disable="attendants.length == 0"
+      size="lg"
+      @click="doResume()"
+    ></q-btn>
 
-    <section class="q-mt-md row items-center justify-center">
-      <template v-if="attendants.some((a) => !a.hasFinished)">
-        <q-btn
-          v-if="tickerId"
-          icon="pause"
-          label="Pause"
-          :disable="attendants.length == 0"
-          size="md"
-          @click="doPause()"
-          class="col-3"
-        ></q-btn>
-        <q-btn
-          v-else
-          icon="play_arrow"
-          label="Talk"
-          :disable="attendants.length == 0"
-          size="md"
-          @click="doResume()"
-          class="col-3"
-        ></q-btn>
-      </template>
-      <q-btn
-        v-if="activeAttendantIndex > -1 || nextAttendantIndex > -1"
-        icon="navigate_next"
-        label="Next person"
-        :disable="attendants.length == 0"
-        size="md"
-        class="col-3 q-ml-md"
-        @click="doNext()"
-      ></q-btn>
-    </section>
-  </q-card-section>
+    <q-btn
+      v-if="activeAttendantIndex > -1 || nextAttendantIndex > -1"
+      :disable="attendants.length == 0"
+      icon="play_arrow"
+      size="lg"
+      class="q-mt-md"
+      color="secondary"
+      @click="doNext()"
+    >
+      {{ nextAttendant ? 'Next speaker:' : 'Finish:' }} <br />{{
+        nextAttendant ? nextAttendant.name : activeAttendant?.name
+      }}
+    </q-btn>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Notify } from 'quasar';
@@ -45,7 +35,7 @@ import { Notify } from 'quasar';
 const { attendants, activeAttendantIndex, activeAttendant, nextAttendantIndex, nextAttendant } =
   storeToRefs(useMeetingStore());
 
-const TICK_INTERVAL_MS = 100;
+const TICK_INTERVAL_MS = 1000;
 
 const tickerId = ref<NodeJS.Timeout | undefined>(undefined);
 
@@ -72,13 +62,13 @@ const startTicker = () => {
 const doResume = () => {
   // TODO - simplify a bit
   if (activeAttendantIndex.value > -1) {
-    Notify.create({ type: 'info', message: `${activeAttendant.value?.name} continues NOW! :)` });
+    notifyMessage('info', `${activeAttendant.value?.name} continues NOW!`);
     startTicker();
     return;
   }
 
   if (nextAttendantIndex.value > -1) {
-    Notify.create({ type: 'info', message: `${nextAttendant.value?.name} continues NOW! :)` });
+    notifyMessage('info', `${nextAttendant.value?.name} continues NOW!`);
     activeAttendantIndex.value = nextAttendantIndex.value;
     startTicker();
   }
@@ -93,6 +83,7 @@ const stopTicker = () => {
 const doPause = () => {
   if (!tickerId.value) return;
   stopTicker();
+  notifyMessage('info', `${activeAttendant.value?.name} catches a breath...`);
 };
 
 const doNext = () => {
@@ -109,12 +100,27 @@ const doNext = () => {
 
   // start next person if applicable
   if (nextAttendantIndex.value > -1) {
-    Notify.create({ type: 'info', message: `${nextAttendant.value?.name} talks NOW! :)` });
+    notifyMessage('info', `${nextAttendant.value?.name} talks NOW! :)`);
     activeAttendantIndex.value = nextAttendantIndex.value;
     startTicker();
     return;
   }
 
-  Notify.create({ type: 'positive', message: 'All have spoken!' });
+  notifyMessage('positive', 'All have spoken!');
+};
+
+const playLabel = computed(() => {
+  const att = activeAttendant.value;
+  if (!att) return undefined;
+  const verb = att.msElapsed > 0 ? 'Continue' : 'Start';
+  return `${verb} ${att.name}`;
+});
+
+const pauseLabel = computed(() => {
+  return `Pause ${activeAttendant.value?.name}`;
+});
+
+const notifyMessage = (type: string, message: string) => {
+  Notify.create({ position: 'bottom-left', type, message });
 };
 </script>

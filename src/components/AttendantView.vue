@@ -3,13 +3,13 @@
     :value="attendant.msElapsed / msPerAttendant"
     size="3rem"
     color="primary"
-    animation-speed="100"
+    :animation-speed="900"
     rounded
     class="q-mt-sm"
   >
     <div :key="attendantIndex" class="absolute-full flex flex-center row">
       <div class="col-12 row items-center q-px-md">
-        <q-badge color="grey-6" class="text-white text-subtitle1">{{ attendant.name }}</q-badge>
+        <q-badge color="grey-5" class="text-white text-subtitle1">{{ attendant.name }}</q-badge>
         <q-space></q-space>
         <q-chip
           v-if="attendant.hasFinished || isActive"
@@ -19,10 +19,9 @@
         />
         <q-space></q-space>
         <q-btn
-          round
           dense
           icon="close"
-          color="grey-6"
+          color="grey-5"
           text-color="white"
           @click="attendants.splice(attendantIndex, 1)"
         ></q-btn>
