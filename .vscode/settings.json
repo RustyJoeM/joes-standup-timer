@@ -7,5 +7,5 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
   "prettier.printWidth": 120,
-  "cSpell.words": ["pinia", "vuedraggable"]
+  "cSpell.words": ["pinia", "tada", "vuedraggable"]
 }
