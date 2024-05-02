@@ -9,7 +9,12 @@
   >
     <div :key="attendantIndex" class="absolute-full flex flex-center row">
       <div class="col-12 row items-center q-px-md">
-        <q-badge color="grey-5" class="text-white text-subtitle1">{{ attendant.name }}</q-badge>
+        <q-badge color="grey-5" class="text-white text-subtitle1">
+          {{ attendant.name }}
+          <q-popup-edit v-model="attendant.name" auto-save v-slot="scope">
+            <q-input filled v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
+          </q-popup-edit>
+        </q-badge>
         <q-space></q-space>
         <q-chip
           v-if="attendant.hasFinished || isActive"
