@@ -1,8 +1,6 @@
 <template>
   <span class="row items-center text-subtitle1">
-    <b>{{ matchingNames?.join(' & ') }}</b> &nbsp; get{{
-      matchingNames && matchingNames.length > 1 ? '' : 's'
-    }}
+    <b>{{ edgeNames?.join(' & ') }}</b> &nbsp; get{{ edgeNames && edgeNames.length > 1 ? '' : 's' }}
     the &nbsp;
     <transition
       :appear="props.delayAnimMs == undefined"
@@ -33,7 +31,7 @@ const counter = ref(0);
 
 const randomizedTitle = ref('');
 
-const matchingNames = computed(() => {
+const edgeNames = computed(() => {
   const arr = props.attendants;
   if (!arr || arr.length < 1) return undefined;
 
@@ -45,6 +43,7 @@ const matchingNames = computed(() => {
     const cmp = props.mode == 'min' ? msElapsed < record : msElapsed > record;
     if (cmp) {
       people = [name];
+      record = msElapsed;
     } else if (msElapsed == record) {
       people.push(name);
     }
