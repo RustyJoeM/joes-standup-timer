@@ -4,10 +4,8 @@
       <q-toolbar>
         <q-toolbar-title> RustyJoe's Standup Timer </q-toolbar-title>
 
-        <dark-mode-toggle dense size="sm"></dark-mode-toggle>
-        <q-btn flat dense size="sm" icon="question_mark" class="q-ml-md">
-          <q-tooltip>Vue v{{ version }} / Quasar v{{ $q.version }}</q-tooltip>
-        </q-btn>
+        <dark-mode-toggle dense size="md"></dark-mode-toggle>
+        <dev-tools class="q-ml-md"></dev-tools>
       </q-toolbar>
     </q-header>
 
@@ -18,6 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { version } from 'vue';
-import DarkModeToggle from 'src/components/DarkModeToggle.vue';
+import DarkModeToggle from 'components/DarkModeToggle.vue';
+import DevTools from 'components/DevTools.vue';
 </script>
