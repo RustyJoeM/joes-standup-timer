@@ -2,7 +2,12 @@
   <section>
     <section class="row">
       <section class="text-h6">
-        <span v-if="attendants.length > 0">Attendants ({{ attendants.length }} in total)</span>
+        <template v-if="attendants.length > 0">
+          <span
+            >Meeting roster - {{ attendants.length }}
+            {{ attendants.length > 1 ? 'people' : ' person' }} - total time {{ totalMeetingTime }}
+          </span>
+        </template>
         <span v-else>Attendants not set yet</span>
       </section>
 
@@ -44,15 +49,32 @@
         </template>
       </draggable>
     </section>
+
+    <transition
+      mode="out-in"
+      enter-active-class="animated zoomIn slow"
+      leave-active-class="animated zoomOut slow"
+    >
+      <section v-if="attendants.length > 0" class="q-mt-sm row justify-center">
+        <span class="col-9">(drag around to reorder)</span>
+      </section>
+    </transition>
   </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import AttendantView from './AttendantView.vue';
 import { useMeetingStore } from 'src/stores/meetingStore';
+import { msToFormatted } from './AttendantModel';
 
 const { shuffleAttendants } = useMeetingStore();
-const { attendants, activeAttendantIndex } = storeToRefs(useMeetingStore());
+const { attendants, msPerAttendant, activeAttendantIndex } = storeToRefs(useMeetingStore());
+
+const totalMeetingTime = computed(() => {
+  const msTotal = msPerAttendant.value * attendants.value.length;
+  return msToFormatted(msTotal);
+});
 </script>
