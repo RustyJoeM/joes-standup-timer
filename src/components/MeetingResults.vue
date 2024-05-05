@@ -16,15 +16,31 @@
         <span class="q-ml-md">
           The team took a bit longer (by {{ msToFormatted(overdrawnMs) }}) than planned...
         </span>
-        <q-icon name="heart_broken" size="md" color="negative" class="q-ml-md"></q-icon>
+        <transition mode="out-in" appear enter-active-class="animated heartBeat slower">
+          <q-icon
+            name="heart_broken"
+            size="md"
+            color="negative"
+            class="q-ml-md"
+            :key="posCounter"
+            @click="posCounter++"
+          ></q-icon>
+        </transition>
       </template>
 
       <template v-if="savedMs">
         <span class="q-ml-md">
           The team saved some time ({{ msToFormatted(savedMs) }}) in total!</span
         >
-        <transition appear enter-active-class="animated tada slower">
-          <q-icon name="celebration" size="md" color="positive" class="q-ml-md"></q-icon>
+        <transition mode="out-in" appear enter-active-class="animated rubberBand slower">
+          <q-icon
+            name="celebration"
+            size="md"
+            color="positive"
+            class="q-ml-md"
+            :key="negCounter"
+            @click="negCounter++"
+          ></q-icon>
         </transition>
       </template>
     </section>
@@ -38,6 +54,7 @@
         :title-pool="MIN_TIME_TITLES"
         reason="using the least time"
         mode="min"
+        :delay-anim-ms="1000"
       >
         <template #rivet><q-spinner-hearts size="2rem"></q-spinner-hearts></template>
       </min-max-award-chip>
@@ -48,7 +65,7 @@
         :title-pool="MAX_TIME_TITLES"
         reason="the good use of large slice of meeting"
         mode="max"
-        :delay-anim-ms="1000"
+        :delay-anim-ms="2000"
       >
         <template #rivet><q-spinner-infinity size="2rem"></q-spinner-infinity></template>
       </min-max-award-chip>
@@ -59,12 +76,16 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { msToFormatted } from './AttendantModel';
 
 import MinMaxAwardChip from './MinMaxAwardChip.vue';
 
 const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
+
+// animation keys
+const posCounter = ref(0);
+const negCounter = ref(0);
 
 const totalTimeMs = computed(() => {
   return attendants.value

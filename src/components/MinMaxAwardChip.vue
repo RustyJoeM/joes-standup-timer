@@ -5,9 +5,9 @@
     <transition
       :appear="props.delayAnimMs == undefined"
       mode="out-in"
-      enter-active-class="animated rubberBand slower"
+      enter-active-class="animated tada slower"
     >
-      <q-chip clickable color="amber" :key="counter" @click="counter++">
+      <q-chip clickable color="amber" :key="counter" @click="counter++" class="text-black">
         <slot name="rivet"></slot> &nbsp; {{ randomizedTitle }} &nbsp; <slot name="rivet"></slot>
       </q-chip>
     </transition>
