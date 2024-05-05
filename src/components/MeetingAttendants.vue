@@ -55,7 +55,7 @@
       enter-active-class="animated zoomIn slow"
       leave-active-class="animated zoomOut slow"
     >
-      <section v-if="attendants.length > 0" class="q-mt-sm row justify-center">
+      <section v-if="attendants.length > 1" class="q-mt-sm row justify-center">
         <span class="col-9">(drag around to reorder)</span>
       </section>
     </transition>
