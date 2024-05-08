@@ -53,7 +53,7 @@ const startTicker = () => {
     }
     const now = performance.now();
     const elapsedMs = lastTickMs.value ? now - lastTickMs.value : tickSize.value;
-    activeAttendant.value.msElapsed += elapsedMs;
+    activeAttendant.value.msElapsed += Math.floor(elapsedMs);
     lastTickMs.value = now;
   }, tickSize.value);
 };
