@@ -16,12 +16,14 @@
       </q-input>
 
       <q-input
+        ref="newNameRef"
         v-model="newName"
         dense
         outlined
         label="Add name"
         @keyup.enter="addNewAttendant()"
         class="q-ml-md col-3"
+        :rules="[(val) => nameAlreadyAdded(val) || 'Same name already added']"
       >
         <template #append>
           <q-btn dense flat icon="add" @click="addNewAttendant()"></q-btn>
@@ -41,21 +43,30 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { QInput } from 'quasar';
+
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { MIN_TALK_TIME_MS } from './AttendantModel';
 
-const { msPerAttendant } = storeToRefs(useMeetingStore());
+const newNameRef = ref<QInput | null>(null);
+
+const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
 const { addAttendant } = useMeetingStore();
 
-const addNewAttendant = () => {
-  if (newName.value.length == 0) return;
-
-  let name = newName.value;
+const cappedName = (name: string) => {
   if (doCapitalize.value) {
-    name = name.charAt(0).toUpperCase() + name.slice(1);
+    return name.charAt(0).toUpperCase() + name.slice(1);
   }
-  addAttendant(name);
+  return name;
+};
 
+const addNewAttendant = () => {
+  if (!newNameRef.value?.validate()) {
+    return;
+  }
+
+  if (newName.value.length == 0) return;
+  addAttendant(cappedName(newName.value));
   newName.value = '';
 };
 
@@ -69,6 +80,10 @@ const secPerAttendant = computed({
 const newName = ref('');
 
 const doCapitalize = ref(true);
+
+const nameAlreadyAdded = (val: string) => {
+  return !attendants.value.some((att) => att.name == cappedName(val));
+};
 
 defineProps<{
   meetingStarted: boolean;
