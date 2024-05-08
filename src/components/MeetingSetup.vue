@@ -11,7 +11,6 @@
         outlined
         label="Seconds per person"
         class="col-2"
-        :readonly="meetingStarted"
       >
         <q-tooltip v-if="meetingStarted">Reset meeting to modify</q-tooltip>
       </q-input>
