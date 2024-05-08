@@ -1,29 +1,27 @@
 import { defineStore } from 'pinia';
-import { MIN_TALK_TIME_MS, MeetingAttendant, newAttendant } from 'src/components/AttendantModel';
+import {
+  MIN_TALK_TIME_MS,
+  AttendantId,
+  Attendant,
+  newAttendant,
+} from 'src/components/AttendantModel';
 
 export const useMeetingStore = defineStore('meeting', {
   state: () => ({
     msPerAttendant: MIN_TALK_TIME_MS,
-    attendants: [] as MeetingAttendant[],
-    activeAttendantIndex: -1,
+    attendants: [] as Attendant[],
+    activeAttendantId: undefined as AttendantId | undefined,
   }),
 
   getters: {
-    activeAttendant: (state): MeetingAttendant | undefined => {
-      if (state.activeAttendantIndex < 0) return undefined;
-      if (state.attendants.length <= state.activeAttendantIndex) return undefined;
-      return state.attendants[state.activeAttendantIndex];
+    activeAttendant: (state): Attendant | undefined => {
+      if (!state.activeAttendantId) return undefined;
+      return state.attendants.find((att) => att._uid == state.activeAttendantId);
     },
 
-    nextAttendantIndex: (state): number => {
-      return state.attendants.findIndex(
-        (att, index) => !att.hasFinished && index != state.activeAttendantIndex
-      );
-    },
-
-    nextAttendant: (state): MeetingAttendant | undefined => {
+    nextAttendant: (state): Attendant | undefined => {
       return state.attendants.find(
-        (att, index) => !att.hasFinished && index != state.activeAttendantIndex
+        (att) => !att.hasFinished && att._uid != state.activeAttendantId
       );
     },
   },

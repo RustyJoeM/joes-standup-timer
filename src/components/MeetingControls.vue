@@ -11,7 +11,7 @@
     ></q-btn>
 
     <q-btn
-      v-if="activeAttendantIndex > -1 || nextAttendantIndex > -1"
+      v-if="activeAttendant || nextAttendant"
       :disable="attendants.length == 0"
       icon="play_arrow"
       size="lg"
@@ -32,8 +32,9 @@ import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Notify } from 'quasar';
 
-const { attendants, activeAttendantIndex, activeAttendant, nextAttendantIndex, nextAttendant } =
-  storeToRefs(useMeetingStore());
+const { attendants, activeAttendant, activeAttendantId, nextAttendant } = storeToRefs(
+  useMeetingStore()
+);
 
 const TICK_INTERVAL_MS = 1000;
 
@@ -61,15 +62,15 @@ const startTicker = () => {
 
 const doResume = () => {
   // TODO - simplify a bit
-  if (activeAttendantIndex.value > -1) {
+  if (activeAttendantId.value) {
     notifyMessage('info', `${activeAttendant.value?.name} continues NOW!`);
     startTicker();
     return;
   }
 
-  if (nextAttendantIndex.value > -1) {
+  if (nextAttendant.value) {
     notifyMessage('info', `${nextAttendant.value?.name} continues NOW!`);
-    activeAttendantIndex.value = nextAttendantIndex.value;
+    activeAttendantId.value = nextAttendant.value._uid;
     startTicker();
   }
 };
@@ -95,13 +96,13 @@ const doNext = () => {
   // finish currently talking person
   if (activeAttendant.value) {
     activeAttendant.value.hasFinished = true;
-    activeAttendantIndex.value = -1;
+    activeAttendantId.value = undefined;
   }
 
   // start next person if applicable
-  if (nextAttendantIndex.value > -1) {
+  if (nextAttendant.value) {
     notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
-    activeAttendantIndex.value = nextAttendantIndex.value;
+    activeAttendantId.value = nextAttendant.value._uid;
     startTicker();
     return;
   }

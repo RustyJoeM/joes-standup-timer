@@ -35,7 +35,7 @@
 
     <section class="q-mt-md row justify-center">
       <draggable :list="attendants" item-key="_uid" class="col-9">
-        <template #item="{ index }">
+        <template #item="{ index, element }: { index: number, element: Attendant }">
           <transition
             appear
             enter-active-class="animated zoomIn slow"
@@ -43,7 +43,7 @@
           >
             <attendant-view
               :attendant-index="index"
-              :is-active="index == activeAttendantIndex"
+              :is-active="element._uid == activeAttendantId"
             ></attendant-view>
           </transition>
         </template>
@@ -66,12 +66,13 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
+
 import AttendantView from './AttendantView.vue';
 import { useMeetingStore } from 'src/stores/meetingStore';
-import { msToFormatted } from './AttendantModel';
+import { Attendant, msToFormatted } from './AttendantModel';
 
 const { shuffleAttendants } = useMeetingStore();
-const { attendants, msPerAttendant, activeAttendantIndex } = storeToRefs(useMeetingStore());
+const { attendants, msPerAttendant, activeAttendantId } = storeToRefs(useMeetingStore());
 
 const totalMeetingTime = computed(() => {
   const msTotal = msPerAttendant.value * attendants.value.length;

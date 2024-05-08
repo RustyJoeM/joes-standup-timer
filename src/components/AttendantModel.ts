@@ -2,14 +2,16 @@ import { uid } from 'quasar';
 
 export const MIN_TALK_TIME_MS = 60 * 1000;
 
-export interface MeetingAttendant {
-  _uid: string;
+export type AttendantId = string;
+
+export interface Attendant {
+  _uid: AttendantId;
   name: string;
   msElapsed: number;
   hasFinished: boolean;
 }
 
-export function newAttendant(name: string): MeetingAttendant {
+export function newAttendant(name: string): Attendant {
   return { _uid: uid(), name, msElapsed: 0, hasFinished: false };
 }
 

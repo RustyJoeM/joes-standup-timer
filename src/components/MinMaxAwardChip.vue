@@ -17,10 +17,10 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { MeetingAttendant } from './AttendantModel';
+import { Attendant } from './AttendantModel';
 
 const props = defineProps<{
-  attendants: MeetingAttendant[];
+  attendants: Attendant[];
   titlePool: string[];
   reason: string;
   mode: 'min' | 'max';
