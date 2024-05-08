@@ -6,8 +6,11 @@ import {
   newAttendant,
 } from 'src/components/AttendantModel';
 
+const TICK_INTERVAL_MS = 100;
+
 export const useMeetingStore = defineStore('meeting', {
   state: () => ({
+    tickSize: TICK_INTERVAL_MS,
     msPerAttendant: MIN_TALK_TIME_MS,
     attendants: [] as Attendant[],
     activeAttendantId: undefined as AttendantId | undefined,

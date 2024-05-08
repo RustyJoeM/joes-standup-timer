@@ -1,9 +1,9 @@
 <template>
   <q-linear-progress
-    :value="attendant.msElapsed / msPerAttendant"
+    :value="progress"
     size="3rem"
     color="primary"
-    :animation-speed="900"
+    :animation-speed="animSpeed"
     rounded
     class="q-mt-sm"
   >
@@ -46,10 +46,17 @@ const props = defineProps<{
   isActive: boolean;
 }>();
 
-const { msPerAttendant, attendants } = storeToRefs(useMeetingStore());
+const { msPerAttendant, attendants, tickSize } = storeToRefs(useMeetingStore());
+
+const animSpeed = computed(() => 0.95 * tickSize.value);
 
 const attendant = computed(() => {
   return attendants.value[props.attendantIndex];
+});
+
+const progress = computed(() => {
+  const roundedMillis = Math.floor(attendant.value.msElapsed / 1000) * 1000;
+  return roundedMillis / msPerAttendant.value;
 });
 
 const formattedTimestamp = computed(() => {

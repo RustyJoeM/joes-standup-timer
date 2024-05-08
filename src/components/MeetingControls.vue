@@ -32,11 +32,9 @@ import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Notify } from 'quasar';
 
-const { attendants, activeAttendant, activeAttendantId, nextAttendant } = storeToRefs(
+const { attendants, activeAttendant, activeAttendantId, nextAttendant, tickSize } = storeToRefs(
   useMeetingStore()
 );
-
-const TICK_INTERVAL_MS = 1000;
 
 const tickerId = ref<NodeJS.Timeout | undefined>(undefined);
 
@@ -54,10 +52,10 @@ const startTicker = () => {
       return;
     }
     const now = performance.now();
-    const elapsedMs = lastTickMs.value ? now - lastTickMs.value : TICK_INTERVAL_MS;
+    const elapsedMs = lastTickMs.value ? now - lastTickMs.value : tickSize.value;
     activeAttendant.value.msElapsed += elapsedMs;
     lastTickMs.value = now;
-  }, TICK_INTERVAL_MS);
+  }, tickSize.value);
 };
 
 const doResume = () => {
