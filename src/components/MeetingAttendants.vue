@@ -5,7 +5,8 @@
         <template v-if="attendants.length > 0">
           <span
             >Meeting roster - {{ attendants.length }}
-            {{ attendants.length > 1 ? 'people' : ' person' }} - total time {{ totalMeetingTime }}
+            {{ attendants.length > 1 ? 'people' : ' person' }} - estimated total time
+            {{ estimatedTotalTime }}
           </span>
         </template>
         <span v-else>Attendants not set yet</span>
@@ -13,13 +14,25 @@
 
       <q-space></q-space>
 
+      <transition appear enter-active-class="animated shakeY slower">
+        <q-btn
+          v-if="attendants.length > 1"
+          icon="shuffle"
+          label="Shuffle"
+          @click="shuffleAttendants()"
+        >
+          <q-tooltip>Shuffle order of speakers</q-tooltip>
+        </q-btn>
+      </transition>
+
       <q-btn
-        v-if="attendants.length > 1"
-        icon="shuffle"
-        label="Shuffle"
-        @click="shuffleAttendants()"
+        icon="repeat"
+        label="Reset times"
+        :disable="!attendants.some((att) => att.msElapsed > 0)"
+        @click="resetTimes()"
+        class="q-ml-md"
       >
-        <q-tooltip>Shuffle order of speakers</q-tooltip>
+        <q-tooltip>Reset elapsed times' of all attendants</q-tooltip>
       </q-btn>
 
       <q-btn
@@ -29,7 +42,7 @@
         @click="attendants = []"
         class="q-ml-md"
       >
-        <q-tooltip>Clear all attendants</q-tooltip>
+        <q-tooltip>Remove all attendants</q-tooltip>
       </q-btn>
     </section>
 
@@ -74,8 +87,15 @@ import { Attendant, msToFormatted } from './AttendantModel';
 const { shuffleAttendants } = useMeetingStore();
 const { attendants, msPerAttendant, activeAttendantId } = storeToRefs(useMeetingStore());
 
-const totalMeetingTime = computed(() => {
+const estimatedTotalTime = computed(() => {
   const msTotal = msPerAttendant.value * attendants.value.length;
   return msToFormatted(msTotal);
 });
+
+const resetTimes = () => {
+  for (const att of attendants.value) {
+    att.msElapsed = 0;
+    att.hasFinished = false;
+  }
+};
 </script>
