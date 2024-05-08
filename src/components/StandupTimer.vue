@@ -10,10 +10,16 @@
         <meeting-controls></meeting-controls>
       </q-page-sticky>
 
-      <template v-if="meetingHasFinished">
-        <q-separator class="q-mt-lg"></q-separator>
-        <meeting-results class="q-mt-lg"></meeting-results>
-      </template>
+      <transition
+        appear
+        enter-active-class="animated backInDown slow"
+        leave-active-class="animated backOutUp slow"
+      >
+        <section v-if="meetingHasFinished">
+          <q-separator class="q-mt-lg"></q-separator>
+          <meeting-results class="q-mt-lg"></meeting-results>
+        </section>
+      </transition>
     </q-card-section>
   </q-card>
 </template>
