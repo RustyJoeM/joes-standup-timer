@@ -46,7 +46,7 @@ const props = defineProps<{
   isActive: boolean;
 }>();
 
-const { msPerAttendant, attendants, tickSize } = storeToRefs(useMeetingStore());
+const { msPerAttendant, attendants, tickSize, displayMillis } = storeToRefs(useMeetingStore());
 
 const animSpeed = computed(() => 0.95 * tickSize.value);
 
@@ -55,14 +55,27 @@ const attendant = computed(() => {
 });
 
 const progress = computed(() => {
+  // return exact fraction for finished talkers
+  if (attendant.value.hasFinished) {
+    return attendant.value.msElapsed / msPerAttendant.value;
+  }
+  // return full second rounded progress only for more discrete animation
   const roundedMillis = Math.floor(attendant.value.msElapsed / 1000) * 1000;
   return roundedMillis / msPerAttendant.value;
 });
 
 const formattedTimestamp = computed(() => {
   const elapsedMs = attendant.value.msElapsed;
-  const sign = elapsedMs > msPerAttendant.value ? 'Overtime: ' : '';
-  const timestamp = msToFormatted(elapsedMs);
-  return `${sign}${timestamp}`;
+
+  const showMillis = attendant.value.hasFinished ? displayMillis.value : false;
+  // print elapsed time in simple way
+  if (elapsedMs <= msPerAttendant.value) {
+    return `${msToFormatted(elapsedMs, showMillis)}`;
+  }
+  // print planned + overtime
+  return `${msToFormatted(msPerAttendant.value, false)} + ${msToFormatted(
+    elapsedMs - msPerAttendant.value,
+    showMillis
+  )} overtime`;
 });
 </script>

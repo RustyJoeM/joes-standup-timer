@@ -7,14 +7,15 @@
         dense
         outlined
         class="q-ml-md col-2"
-        :model-value="msToFormatted(totalTimeMs)"
+        :model-value="msToFormatted(totalElapsedMs, displayMillis)"
         label="Total time taken"
         readonly
       ></q-input>
 
       <template v-if="overdrawnMs">
         <span class="q-ml-md">
-          The team took a bit longer (by {{ msToFormatted(overdrawnMs) }}) than planned...
+          The team took a bit longer (by {{ msToFormatted(overdrawnMs, displayMillis) }}) than
+          planned...
         </span>
         <transition mode="out-in" appear enter-active-class="animated heartBeat slower">
           <q-icon
@@ -30,7 +31,7 @@
 
       <template v-if="savedMs">
         <span class="q-ml-md">
-          The team saved some time ({{ msToFormatted(savedMs) }}) in total!</span
+          The team saved some time ({{ msToFormatted(savedMs, displayMillis) }}) in total!</span
         >
         <transition mode="out-in" appear enter-active-class="animated rubberBand slower">
           <q-icon
@@ -81,13 +82,13 @@ import { msToFormatted } from './AttendantModel';
 
 import MinMaxAwardChip from './MinMaxAwardChip.vue';
 
-const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
+const { attendants, msPerAttendant, displayMillis } = storeToRefs(useMeetingStore());
 
 // animation keys
 const posCounter = ref(0);
 const negCounter = ref(0);
 
-const totalTimeMs = computed(() => {
+const totalElapsedMs = computed(() => {
   return attendants.value
     .map((att) => att.msElapsed)
     .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
@@ -96,11 +97,11 @@ const totalTimeMs = computed(() => {
 const plannedMs = computed(() => attendants.value.length * msPerAttendant.value);
 
 const overdrawnMs = computed(() =>
-  totalTimeMs.value > plannedMs.value ? totalTimeMs.value - plannedMs.value : undefined
+  totalElapsedMs.value > plannedMs.value ? totalElapsedMs.value - plannedMs.value : undefined
 );
 
 const savedMs = computed(() =>
-  totalTimeMs.value < plannedMs.value ? plannedMs.value - totalTimeMs.value : undefined
+  totalElapsedMs.value < plannedMs.value ? plannedMs.value - totalElapsedMs.value : undefined
 );
 
 const MIN_TIME_TITLES = ['time savior', 'most considerate', 'standup lightning'];

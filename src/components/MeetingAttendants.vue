@@ -89,7 +89,7 @@ const { attendants, msPerAttendant, activeAttendantId } = storeToRefs(useMeeting
 
 const estimatedTotalTime = computed(() => {
   const msTotal = msPerAttendant.value * attendants.value.length;
-  return msToFormatted(msTotal);
+  return msToFormatted(msTotal, false);
 });
 
 const resetTimes = () => {

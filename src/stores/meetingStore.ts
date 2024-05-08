@@ -14,6 +14,7 @@ export const useMeetingStore = defineStore('meeting', {
     msPerAttendant: MIN_TALK_TIME_MS,
     attendants: [] as Attendant[],
     activeAttendantId: undefined as AttendantId | undefined,
+    displayMillis: false,
   }),
 
   getters: {
