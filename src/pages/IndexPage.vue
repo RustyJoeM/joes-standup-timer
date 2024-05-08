@@ -1,6 +1,6 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <standup-timer></standup-timer>
+  <q-page class="q-my-xl row items-start justify-evenly">
+    <standup-timer class="col-8"></standup-timer>
   </q-page>
 </template>
 

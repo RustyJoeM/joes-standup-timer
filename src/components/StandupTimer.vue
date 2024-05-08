@@ -1,23 +1,21 @@
 <template>
-  <section style="width: 66vw; height: 80vh">
-    <q-card>
-      <q-card-section>
-        <meeting-setup :meeting-started="meetingHasStarted"></meeting-setup>
+  <q-card>
+    <q-card-section>
+      <meeting-setup :meeting-started="meetingHasStarted"></meeting-setup>
 
+      <q-separator class="q-mt-lg"></q-separator>
+      <meeting-attendants class="q-mt-lg"></meeting-attendants>
+
+      <q-page-sticky position="bottom" :offset="[32, 32]">
+        <meeting-controls></meeting-controls>
+      </q-page-sticky>
+
+      <template v-if="meetingHasFinished">
         <q-separator class="q-mt-lg"></q-separator>
-        <meeting-attendants class="q-mt-lg"></meeting-attendants>
-
-        <q-page-sticky position="bottom" :offset="[32, 32]">
-          <meeting-controls></meeting-controls>
-        </q-page-sticky>
-
-        <template v-if="meetingHasFinished">
-          <q-separator class="q-mt-lg"></q-separator>
-          <meeting-results class="q-mt-lg"></meeting-results>
-        </template>
-      </q-card-section>
-    </q-card>
-  </section>
+        <meeting-results class="q-mt-lg"></meeting-results>
+      </template>
+    </q-card-section>
+  </q-card>
 </template>
 
 <script setup lang="ts">
