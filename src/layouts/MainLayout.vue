@@ -2,12 +2,20 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-toolbar-title> RustyJoe's Standup Timer </q-toolbar-title>
+        <section class="col">
+          <q-toolbar-title> RustyJoe's Standup Timer </q-toolbar-title>
+        </section>
 
-        <display-millis-toggle></display-millis-toggle>
+        <section class="col row justify-center">
+          <template-manager></template-manager>
+        </section>
 
-        <dark-mode-toggle dense size="md" class="q-ml-md"></dark-mode-toggle>
-        <dev-tools class="q-ml-md"></dev-tools>
+        <section class="col row justify-end">
+          <display-millis-toggle></display-millis-toggle>
+
+          <dark-mode-toggle dense size="md" :class="GUTTER_CLASS"></dark-mode-toggle>
+          <dev-tools :class="GUTTER_CLASS"></dev-tools>
+        </section>
       </q-toolbar>
     </q-header>
 
@@ -18,7 +26,10 @@
 </template>
 
 <script setup lang="ts">
+import TemplateManager from 'components/TemplateManager.vue';
 import DisplayMillisToggle from 'components/DisplayMillisToggle.vue';
 import DarkModeToggle from 'components/DarkModeToggle.vue';
 import DevTools from 'components/DevTools.vue';
+
+const GUTTER_CLASS = 'q-ml-md';
 </script>

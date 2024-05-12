@@ -5,6 +5,7 @@ import {
   Attendant,
   newAttendant,
 } from 'src/components/AttendantModel';
+import { MeetingTemplate } from 'src/components/TemplateModel';
 
 const TICK_INTERVAL_MS = 100;
 
@@ -15,6 +16,7 @@ export const useMeetingStore = defineStore('meeting', {
     attendants: [] as Attendant[],
     activeAttendantId: undefined as AttendantId | undefined,
     displayMillis: false,
+    meetingTemplates: [] as MeetingTemplate[],
   }),
 
   getters: {
