@@ -2,7 +2,7 @@
   <section>
     <span class="text-h6">Meeting setup</span>
 
-    <section class="q-mt-md q-ml-md row">
+    <section class="q-mt-md q-ml-md row items-baseline">
       <q-input
         type="number"
         :min="MIN_TALK_TIME_MS / 1000"
@@ -12,7 +12,6 @@
         label="Seconds per person"
         class="col-2"
       >
-        <q-tooltip v-if="meetingStarted">Reset meeting to modify</q-tooltip>
       </q-input>
 
       <q-input
