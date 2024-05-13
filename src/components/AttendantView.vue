@@ -9,27 +9,31 @@
   >
     <div :key="attendantIndex" class="absolute-full flex flex-center row">
       <div class="col-12 row items-center q-px-md">
-        <q-badge color="grey-5" class="text-white text-subtitle1">
-          <span class="text-black">{{ attendant.name }}</span>
-          <q-popup-edit v-model="attendant.name" auto-save v-slot="scope">
-            <q-input filled v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
-          </q-popup-edit>
-        </q-badge>
-        <q-space></q-space>
-        <q-chip
-          v-if="attendant.hasFinished || isActive"
-          square
-          size="md"
-          :label="formattedTimestamp"
-        />
-        <q-space></q-space>
-        <q-btn
-          dense
-          icon="close"
-          color="grey-5"
-          text-color="white"
-          @click="attendants.splice(attendantIndex, 1)"
-        ></q-btn>
+        <section class="col row justify-start">
+          <q-badge color="grey-5" class="text-white text-subtitle1">
+            <span class="text-black">{{ attendant.name }}</span>
+            <q-popup-edit v-model="attendant.name" auto-save v-slot="scope">
+              <q-input filled v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
+            </q-popup-edit>
+          </q-badge>
+        </section>
+        <section class="col row justify-center">
+          <q-chip
+            v-if="attendant.hasFinished || isActive"
+            square
+            size="md"
+            :label="formattedTimestamp"
+          />
+        </section>
+        <section class="col row justify-end">
+          <q-btn
+            dense
+            flat
+            text-color="black"
+            icon="close"
+            @click="attendants.splice(attendantIndex, 1)"
+          ></q-btn>
+        </section>
       </div>
     </div>
   </q-linear-progress>
