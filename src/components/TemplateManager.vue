@@ -2,7 +2,12 @@
   <q-btn dense flat icon="meeting_room" label="Meeting templates">
     <q-menu dense>
       <q-item clickable @click="currentToTemplate" class="row items-center">
-        Save new template
+        <q-item-section> Save new template </q-item-section>
+        <q-item-section side>
+          <q-icon name="question_mark" size="xs">
+            <q-tooltip>into browser's local storage</q-tooltip>
+          </q-icon>
+        </q-item-section>
       </q-item>
       <q-item clickable v-if="meetingTemplates.length > 0">
         <q-item-section>Setup from template</q-item-section>
@@ -32,13 +37,18 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { Notify } from 'quasar';
+import { useLocalStorage } from '@vueuse/core';
+
 import { useMeetingStore } from 'stores/meetingStore';
 import { MeetingTemplate } from './TemplateModel';
 import TemplateView from './TemplateView.vue';
 import { newAttendant } from './AttendantModel';
-import { Notify } from 'quasar';
 
-const { attendants, msPerAttendant, meetingTemplates } = storeToRefs(useMeetingStore());
+const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
+
+const TEMPLATES_KEY = 'joes-standup-meeting';
+const meetingTemplates = useLocalStorage<MeetingTemplate[]>(TEMPLATES_KEY, []);
 
 const currentToTemplate = () => {
   const names = attendants.value.map((att) => att.name);
