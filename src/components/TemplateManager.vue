@@ -37,13 +37,13 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { Notify } from 'quasar';
 import { useLocalStorage } from '@vueuse/core';
 
 import { useMeetingStore } from 'stores/meetingStore';
 import { MeetingTemplate } from './TemplateModel';
 import TemplateView from './TemplateView.vue';
 import { newAttendant } from './AttendantModel';
+import { notifyMessage } from './NotifyHelper';
 
 const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
 
@@ -60,13 +60,13 @@ const currentToTemplate = () => {
     names,
   };
   meetingTemplates.value.push(newTemplate);
-  Notify.create({ type: 'info', message: 'Saved current setup to new template' });
+  notifyMessage('info', 'Saved current setup to new template');
 };
 
 const setupTemplate = (template: MeetingTemplate) => {
   msPerAttendant.value = template.msPerAttendant;
   attendants.value = template.names.map((name) => newAttendant(name));
-  Notify.create({ type: 'info', message: `Setup meeting from template \"${template.label}\"` });
+  notifyMessage('info', `Setup meeting from template \"${template.label}\"`);
 };
 
 const editLabel = (template: MeetingTemplate, val: string) => {

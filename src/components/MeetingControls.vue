@@ -30,7 +30,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
-import { Notify } from 'quasar';
+import { notifyMessage } from './NotifyHelper';
 
 const { attendants, activeAttendant, activeAttendantId, nextAttendant, tickSize } = storeToRefs(
   useMeetingStore()
@@ -118,8 +118,4 @@ const playLabel = computed(() => {
 const pauseLabel = computed(() => {
   return `Pause ${activeAttendant.value?.name}`;
 });
-
-const notifyMessage = (type: string, message: string) => {
-  Notify.create({ position: 'bottom-left', type, message });
-};
 </script>
