@@ -16,7 +16,7 @@
     "@quasar/extras": "^1.16.4",
     "@vueuse/core": "^10.9.0",
     "pinia": "^2.1.7",
-    "quasar": "^2.16.2",
+    "quasar": "^2.16.4",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
     "vuedraggable": "^4.1.0"
