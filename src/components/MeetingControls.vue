@@ -16,7 +16,7 @@
       icon="play_arrow"
       size="lg"
       class="q-mt-md"
-      color="secondary"
+      color="primary"
       @click="doNext()"
     >
       {{ nextAttendant ? 'Next speaker:' : 'Finish:' }} <br />{{

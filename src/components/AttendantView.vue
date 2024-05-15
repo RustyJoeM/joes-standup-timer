@@ -4,33 +4,37 @@
     size="3rem"
     color="primary"
     :animation-speed="animSpeed"
+    :stripe="isActive"
     rounded
     class="q-mt-sm"
   >
     <div :key="attendantIndex" class="absolute-full flex flex-center row">
       <div class="col-12 row items-center q-px-md">
         <section class="col row justify-start">
-          <q-badge color="grey-5" class="text-white text-subtitle1">
-            <span class="text-black">{{ attendant.name }}</span>
+          <q-chip square :color="CHIP_COLOR">
+            <span :class="`text-subtitle1 text-${TEXT_COLOR}`">{{ attendant.name }}</span>
             <q-popup-edit v-model="attendant.name" auto-save v-slot="scope">
               <q-input filled v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
             </q-popup-edit>
-          </q-badge>
+          </q-chip>
         </section>
         <section class="col row justify-center">
           <q-chip
             v-if="attendant.hasFinished || isActive"
+            :color="CHIP_COLOR"
             square
             size="md"
+            :text-color="TEXT_COLOR"
             :label="formattedTimestamp"
           />
         </section>
         <section class="col row justify-end">
           <q-btn
             dense
-            flat
-            text-color="black"
+            :color="CHIP_COLOR"
             icon="close"
+            :text-color="TEXT_COLOR"
+            size="sm"
             @click="attendants.splice(attendantIndex, 1)"
           ></q-btn>
         </section>
@@ -44,6 +48,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { msToFormatted } from './AttendantModel';
+import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   attendantIndex: number;
@@ -71,7 +76,7 @@ const progress = computed(() => {
 const formattedTimestamp = computed(() => {
   const elapsedMs = attendant.value.msElapsed;
 
-  const showMillis = attendant.value.hasFinished ? displayMillis.value : false;
+  const showMillis = attendant.value.hasFinished || props.isActive ? displayMillis.value : false;
   // print elapsed time in simple way
   if (elapsedMs <= msPerAttendant.value) {
     return `${msToFormatted(elapsedMs, showMillis)}`;
@@ -82,4 +87,9 @@ const formattedTimestamp = computed(() => {
     showMillis
   )} overtime`;
 });
+
+const $q = useQuasar();
+
+const CHIP_COLOR = computed(() => ($q.dark.isActive ? 'grey-6' : 'blue-grey-3'));
+const TEXT_COLOR = 'black';
 </script>
