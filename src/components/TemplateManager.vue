@@ -1,5 +1,5 @@
 <template>
-  <q-btn dense flat icon="meeting_room" label="Meeting templates">
+  <q-btn dense icon="meeting_room" label="Meeting templates">
     <q-menu dense>
       <q-item clickable @click="currentToTemplate" class="row items-center">
         <q-item-section> Save new template </q-item-section>
