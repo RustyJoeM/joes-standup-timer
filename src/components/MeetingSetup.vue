@@ -1,6 +1,12 @@
 <template>
   <section>
-    <span class="text-h6">Meeting setup</span>
+    <section class="row items-center">
+      <span class="text-h6">Meeting setup</span>
+      <q-space></q-space>
+      <q-btn flat icon="share" label="share setup" @click="setupToClipboard">
+        <q-tooltip>Copy current setup to URL link</q-tooltip>
+      </q-btn>
+    </section>
 
     <section class="q-mt-md q-ml-md row items-baseline">
       <q-input
@@ -42,10 +48,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { QInput } from 'quasar';
+import { Notify, QInput, copyToClipboard } from 'quasar';
 
 import { useMeetingStore } from 'src/stores/meetingStore';
-import { MIN_TALK_TIME_MS } from './AttendantModel';
+import { MIN_TALK_TIME_MS, newAttendant } from './AttendantModel';
 
 const newNameRef = ref<QInput | null>(null);
 
@@ -87,4 +93,39 @@ const nameAlreadyAdded = (val: string) => {
 defineProps<{
   meetingStarted: boolean;
 }>();
+
+import { watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const NAME_SEPARATOR = ',';
+
+interface SetupQueryProps {
+  secs: number | undefined;
+  names: string | undefined;
+}
+
+watch(
+  () => route.query,
+  (newQuery) => {
+    const queryProps = newQuery as unknown as SetupQueryProps;
+    if (queryProps.secs) {
+      msPerAttendant.value = queryProps.secs * 1000;
+    }
+    if (queryProps.names) {
+      attendants.value = queryProps.names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
+    }
+  },
+  { immediate: true }
+);
+
+const setupToClipboard = () => {
+  const path = window.location.origin;
+  const secs = '' + msPerAttendant.value / 1000;
+  const names = attendants.value.map((att) => att.name).join(NAME_SEPARATOR);
+  const url = `${path}/#/?secs=${secs}&names=${names}`;
+  copyToClipboard(url);
+  Notify.create({ position: 'bottom-right', type: 'info', message: 'URL copied to clipboard...' });
+};
 </script>
