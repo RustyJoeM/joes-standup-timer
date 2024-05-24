@@ -126,6 +126,6 @@ const setupToClipboard = () => {
   const names = attendants.value.map((att) => att.name).join(NAME_SEPARATOR);
   const url = `${path}/#/?secs=${secs}&names=${names}`;
   copyToClipboard(url);
-  Notify.create({ position: 'bottom-right', type: 'info', message: 'URL copied to clipboard...' });
+  Notify.create({ position: 'bottom', type: 'info', message: 'URL copied to clipboard...' });
 };
 </script>
