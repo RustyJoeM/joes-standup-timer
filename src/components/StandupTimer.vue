@@ -6,8 +6,8 @@
       <q-separator class="q-mt-lg"></q-separator>
       <meeting-attendants class="q-mt-lg"></meeting-attendants>
 
-      <q-page-sticky position="bottom" :offset="[32, 32]">
-        <meeting-controls></meeting-controls>
+      <q-page-sticky :offset="controlsPosition">
+        <meeting-controls v-touch-pan.prevent.mouse="moveControls"></meeting-controls>
       </q-page-sticky>
 
       <transition
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 
@@ -40,4 +40,18 @@ const meetingHasStarted = computed(() => attendants.value.some((att) => att.msEl
 const meetingHasFinished = computed(
   () => attendants.value.length > 0 && !attendants.value.some((att) => !att.hasFinished)
 );
+
+const controlsPosition = ref([32, 32]);
+
+const draggingControls = ref(false);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const moveControls = (ev: any) => {
+  draggingControls.value = ev.isFirst !== true && ev.isFinal !== true;
+
+  controlsPosition.value = [
+    controlsPosition.value[0] - ev.delta.x,
+    controlsPosition.value[1] - ev.delta.y,
+  ];
+};
 </script>
