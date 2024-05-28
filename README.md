@@ -2,6 +2,15 @@
 
 Simple standup helper to track talking time of attendants.
 
+See the deployed application on my Github Pages: https://rustyjoem.github.io/standup-timer
+
+This is a client side single page app, no requests to external APIs are being done. <br/>
+No backend running on server, all is happening in the end-users's browser. <br/>
+Local storage is used to save meeting templates, no cookies involved.
+
+Following chapters are the standard Quasar project description/instructions.
+
+
 ## Install the dependencies
 ```bash
 yarn
