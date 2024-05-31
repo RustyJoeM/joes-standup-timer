@@ -4,7 +4,8 @@
       <meeting-setup :meeting-started="meetingHasStarted"></meeting-setup>
 
       <q-separator class="q-mt-lg"></q-separator>
-      <meeting-attendants class="q-mt-lg"></meeting-attendants>
+
+      <component :is="attendantsComponent" class="q-mt-lg"></component>
 
       <q-page-sticky :offset="controlsPosition">
         <meeting-controls v-touch-pan.prevent.mouse="moveControls"></meeting-controls>
@@ -31,10 +32,11 @@ import { useMeetingStore } from 'src/stores/meetingStore';
 
 import MeetingSetup from './MeetingSetup.vue';
 import MeetingAttendants from './MeetingAttendants.vue';
+import MysteryMeetingAttendants from './MysteryMeetingAttendants.vue';
 import MeetingControls from './MeetingControls.vue';
 import MeetingResults from './MeetingResults.vue';
 
-const { attendants } = storeToRefs(useMeetingStore());
+const { attendants, runningMysteryMode } = storeToRefs(useMeetingStore());
 
 const meetingHasStarted = computed(() => attendants.value.some((att) => att.msElapsed > 0));
 const meetingHasFinished = computed(
@@ -54,4 +56,8 @@ const moveControls = (ev: any) => {
     controlsPosition.value[1] - ev.delta.y,
   ];
 };
+
+const attendantsComponent = computed(() =>
+  runningMysteryMode.value ? MysteryMeetingAttendants : MeetingAttendants
+);
 </script>

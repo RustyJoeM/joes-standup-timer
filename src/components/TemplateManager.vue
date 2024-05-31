@@ -42,9 +42,9 @@ import { useLocalStorage } from '@vueuse/core';
 import { useMeetingStore } from 'stores/meetingStore';
 import { MeetingTemplate } from './TemplateModel';
 import TemplateView from './TemplateView.vue';
-import { newAttendant } from './AttendantModel';
 import { notifyMessage } from './NotifyHelper';
 
+const { addAttendant, resetMeeting } = useMeetingStore();
 const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
 
 const TEMPLATES_KEY = 'joes-standup-meeting';
@@ -65,7 +65,8 @@ const currentToTemplate = () => {
 
 const setupTemplate = (template: MeetingTemplate) => {
   msPerAttendant.value = template.msPerAttendant;
-  attendants.value = template.names.map((name) => newAttendant(name));
+  resetMeeting();
+  template.names.forEach((name) => addAttendant(name));
   notifyMessage('info', `Setup meeting from template \"${template.label}\"`);
 };
 

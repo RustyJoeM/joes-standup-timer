@@ -17,6 +17,8 @@ export const useMeetingStore = defineStore('meeting', {
     activeAttendantId: undefined as AttendantId | undefined,
     displayMillis: false,
     meetingTemplates: [] as MeetingTemplate[],
+    runningMysteryMode: false,
+    nextAttendantId: undefined as AttendantId | undefined,
   }),
 
   getters: {
@@ -26,15 +28,15 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     nextAttendant: (state): Attendant | undefined => {
-      return state.attendants.find(
-        (att) => !att.hasFinished && att._uid != state.activeAttendantId
-      );
+      if (!state.nextAttendantId) return undefined;
+      return state.attendants.find((att) => att._uid == state.nextAttendantId);
     },
   },
 
   actions: {
     addAttendant(name: string) {
       this.attendants.push(newAttendant(name));
+      this.updateNextAttendant();
     },
 
     shuffleAttendants() {
@@ -45,8 +47,51 @@ export const useMeetingStore = defineStore('meeting', {
       }
     },
 
-    reset() {
+    resetMeeting() {
       this.attendants = [];
+      this.activeAttendantId = undefined;
+      this.nextAttendantId = undefined;
+    },
+
+    resetTimes() {
+      this.activeAttendantId = undefined;
+      for (const att of this.attendants) {
+        att.msElapsed = 0;
+        att.hasFinished = false;
+      }
+      this.updateNextAttendant();
+    },
+
+    renameAttendant(uid: string, name: string) {
+      const att = this.attendants.find((att) => att._uid == uid);
+      if (!att) throw "Couldn't find attendant to rename!";
+      att.name = name;
+    },
+
+    removeAttendant(uid: string) {
+      const index = this.attendants.findIndex((att) => att._uid == uid);
+      if (index) {
+        this.attendants.splice(index, 1);
+      }
+      this.updateNextAttendant();
+    },
+
+    updateNextAttendant() {
+      if (!this.runningMysteryMode) {
+        const attendant = this.attendants.find(
+          (att) => !att.hasFinished && att._uid != this.activeAttendantId
+        );
+        this.nextAttendantId = attendant ? attendant?._uid : undefined;
+        return;
+      }
+
+      const waitingAttendants: Attendant[] = this.attendants.filter((att) => att.msElapsed == 0);
+      if (waitingAttendants.length == 0) {
+        this.nextAttendantId = undefined;
+        return;
+      }
+      const randomIndex = (Math.random() * waitingAttendants.length) | 0;
+      this.nextAttendantId = waitingAttendants[randomIndex]._uid;
     },
   },
 });

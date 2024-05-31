@@ -66,9 +66,16 @@ import { useMeetingStore } from 'src/stores/meetingStore';
 import { notifyMessage } from './NotifyHelper';
 import ControlButton from './ControlButton.vue';
 
-const { attendants, activeAttendant, activeAttendantId, nextAttendant, tickSize } = storeToRefs(
-  useMeetingStore()
-);
+const { updateNextAttendant } = useMeetingStore();
+
+const {
+  attendants,
+  activeAttendant,
+  activeAttendantId,
+  nextAttendant,
+  tickSize,
+  runningMysteryMode,
+} = storeToRefs(useMeetingStore());
 
 const tickerId = ref<NodeJS.Timeout | undefined>(undefined);
 
@@ -93,18 +100,9 @@ const startTicker = () => {
 };
 
 const doResume = () => {
-  // TODO - simplify a bit
-  if (activeAttendantId.value) {
-    notifyMessage('info', `${activeAttendant.value?.name} resumes NOW!`);
-    startTicker();
-    return;
-  }
-
-  if (nextAttendant.value) {
-    notifyMessage('info', `${nextAttendant.value?.name} resumes NOW!`);
-    activeAttendantId.value = nextAttendant.value._uid;
-    startTicker();
-  }
+  if (!activeAttendantId.value) return;
+  startTicker();
+  notifyMessage('info', `${activeAttendant.value?.name} resumes NOW!`);
 };
 
 const stopTicker = () => {
@@ -130,16 +128,22 @@ const finishActive = () => {
     activeAttendant.value.hasFinished = true;
     activeAttendantId.value = undefined;
   }
+
+  updateNextAttendant();
 };
 
 const doNext = () => {
-  // just to be sure
-  finishActive();
-
   // start next person if applicable
   if (nextAttendant.value) {
     notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
     activeAttendantId.value = nextAttendant.value._uid;
+    if (runningMysteryMode.value) {
+      // update position to preserve talking order
+      const finishedCnt = attendants.value.filter((att) => att.hasFinished).length;
+      const activeIndex = attendants.value.findIndex((att) => att._uid == activeAttendantId.value);
+      const activeAtt = attendants.value.splice(activeIndex, 1)[0];
+      attendants.value.splice(finishedCnt, 0, activeAtt);
+    }
     startTicker();
     return;
   }

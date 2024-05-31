@@ -15,19 +15,13 @@
       <q-space></q-space>
 
       <transition appear enter-active-class="animated shakeY slower">
-        <q-btn
-          v-if="attendants.length > 1"
-          icon="shuffle"
-          label="Shuffle"
-          @click="shuffleAttendants()"
-        >
+        <q-btn v-if="attendants.length > 1" icon="shuffle" @click="shuffleAttendants()">
           <q-tooltip>Shuffle order of speakers</q-tooltip>
         </q-btn>
       </transition>
 
       <q-btn
         icon="repeat"
-        label="Reset times"
         :disable="!attendants.some((att) => att.msElapsed > 0)"
         @click="resetTimes()"
         class="q-ml-md"
@@ -35,27 +29,21 @@
         <q-tooltip>Reset elapsed times' of all attendants</q-tooltip>
       </q-btn>
 
-      <q-btn
-        v-if="attendants.length > 0"
-        icon-right="close"
-        label="Remove all"
-        @click="attendants = []"
-        class="q-ml-md"
-      >
-        <q-tooltip>Remove all attendants</q-tooltip>
+      <q-btn v-if="attendants.length > 0" icon="close" @click="resetMeeting()" class="q-ml-md">
+        <q-tooltip>Reset meeting</q-tooltip>
       </q-btn>
     </section>
 
     <section class="q-mt-md row justify-center">
       <draggable :list="attendants" item-key="_uid" class="col-9">
-        <template #item="{ index, element }: { index: number, element: Attendant }">
+        <template #item="{ element }: { element: Attendant, index: number }">
           <transition
             appear
             enter-active-class="animated zoomIn slow"
             leave-active-class="animated zoomOut slow"
           >
             <attendant-view
-              :attendant-index="index"
+              :attendant="element"
               :is-active="element._uid == activeAttendantId"
             ></attendant-view>
           </transition>
@@ -84,18 +72,11 @@ import AttendantView from './AttendantView.vue';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Attendant, msToFormatted } from './AttendantModel';
 
-const { shuffleAttendants } = useMeetingStore();
+const { shuffleAttendants, resetTimes, resetMeeting } = useMeetingStore();
 const { attendants, msPerAttendant, activeAttendantId } = storeToRefs(useMeetingStore());
 
 const estimatedTotalTime = computed(() => {
   const msTotal = msPerAttendant.value * attendants.value.length;
   return msToFormatted(msTotal, false);
 });
-
-const resetTimes = () => {
-  for (const att of attendants.value) {
-    att.msElapsed = 0;
-    att.hasFinished = false;
-  }
-};
 </script>
