@@ -7,6 +7,16 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
+import { watch } from 'vue';
 
+const { updateNextAttendant } = useMeetingStore();
 const { runningMysteryMode } = storeToRefs(useMeetingStore());
+
+watch(
+  runningMysteryMode,
+  () => {
+    updateNextAttendant();
+  },
+  { immediate: true }
+);
 </script>

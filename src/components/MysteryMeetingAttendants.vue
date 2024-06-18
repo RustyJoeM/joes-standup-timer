@@ -14,6 +14,12 @@
 
       <q-space></q-space>
 
+      <transition appear enter-active-class="animated shakeY slower">
+        <q-btn v-if="attendants.length > 1" icon="shuffle" @click="updateNextAttendant()">
+          <q-tooltip>Shuffle order of speakers</q-tooltip>
+        </q-btn>
+      </transition>
+
       <q-btn
         icon="repeat"
         :disable="!attendants.some((att) => att.msElapsed > 0)"
@@ -77,7 +83,7 @@ import { useMeetingStore } from 'src/stores/meetingStore';
 import { msToFormatted } from './AttendantModel';
 import AttendantChip from './AttendantChip.vue';
 
-const { resetTimes, resetMeeting } = useMeetingStore();
+const { resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
 
 const { attendants, msPerAttendant, activeAttendantId, activeAttendant, nextAttendantId } =
   storeToRefs(useMeetingStore());

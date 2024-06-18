@@ -15,7 +15,7 @@
       <q-space></q-space>
 
       <transition appear enter-active-class="animated shakeY slower">
-        <q-btn v-if="attendants.length > 1" icon="shuffle" @click="shuffleAttendants()">
+        <q-btn v-if="attendants.length > 1" icon="shuffle" @click="doShuffle()">
           <q-tooltip>Shuffle order of speakers</q-tooltip>
         </q-btn>
       </transition>
@@ -72,11 +72,16 @@ import AttendantView from './AttendantView.vue';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Attendant, msToFormatted } from './AttendantModel';
 
-const { shuffleAttendants, resetTimes, resetMeeting } = useMeetingStore();
+const { shuffleAttendants, resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
 const { attendants, msPerAttendant, activeAttendantId } = storeToRefs(useMeetingStore());
 
 const estimatedTotalTime = computed(() => {
   const msTotal = msPerAttendant.value * attendants.value.length;
   return msToFormatted(msTotal, false);
 });
+
+const doShuffle = async () => {
+  shuffleAttendants();
+  updateNextAttendant();
+};
 </script>
