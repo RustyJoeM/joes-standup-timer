@@ -5,6 +5,7 @@ import {
   Attendant,
   newAttendant,
 } from 'src/components/AttendantModel';
+import { notifyMessage } from 'src/components/NotifyHelper';
 import { MeetingTemplate } from 'src/components/TemplateModel';
 
 const TICK_INTERVAL_MS = 100;
@@ -69,8 +70,12 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     removeAttendant(uid: string) {
+      if (uid == this.activeAttendantId) {
+        notifyMessage('warning', "Won't delete current talker...");
+        return;
+      }
       const index = this.attendants.findIndex((att) => att._uid == uid);
-      if (index) {
+      if (index != -1) {
         this.attendants.splice(index, 1);
       }
       this.updateNextAttendant();
