@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-export const MIN_TALK_TIME_MS = 60 * 1000;
+export const MIN_TALK_TIME_MS = 2 * 60 * 1000;
 
 export type AttendantId = string;
 
