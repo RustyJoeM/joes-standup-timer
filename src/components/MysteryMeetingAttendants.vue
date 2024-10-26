@@ -63,6 +63,13 @@
         >
           <div v-for="att of waitingAttendants" :key="att._uid" class="q-ml-md row">
             <attendant-chip :attendant="att" size="lg" class="col-shrink">
+              <q-btn
+                class="q-ml-md"
+                dense
+                icon="close"
+                size="xs"
+                @click="removeAttendant(att._uid)"
+              ></q-btn>
               <transition appear enter-active-class="animated heartBeat slow">
                 <q-badge floating v-if="att._uid == nextAttendantId">NEXT</q-badge>
               </transition>
@@ -83,7 +90,7 @@ import { useMeetingStore } from 'src/stores/meetingStore';
 import { msToFormatted } from './AttendantModel';
 import AttendantChip from './AttendantChip.vue';
 
-const { resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
+const { resetTimes, resetMeeting, updateNextAttendant, removeAttendant } = useMeetingStore();
 
 const { attendants, msPerAttendant, activeAttendantId, activeAttendant, nextAttendantId } =
   storeToRefs(useMeetingStore());
