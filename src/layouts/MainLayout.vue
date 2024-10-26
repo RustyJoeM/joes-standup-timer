@@ -13,8 +13,6 @@
         <section class="col row justify-end">
           <mystery-mode-toggle></mystery-mode-toggle>
           <q-separator vertical class="q-ml-sm"></q-separator>
-          <display-millis-toggle></display-millis-toggle>
-          <q-separator vertical class="q-ml-sm"></q-separator>
 
           <dark-mode-toggle dense size="md" :class="GUTTER_CLASS"></dark-mode-toggle>
           <dev-tools :class="GUTTER_CLASS"></dev-tools>
@@ -30,7 +28,6 @@
 
 <script setup lang="ts">
 import TemplateManager from 'components/TemplateManager.vue';
-import DisplayMillisToggle from 'components/DisplayMillisToggle.vue';
 import MysteryModeToggle from 'components/MysteryModeToggle.vue';
 import DarkModeToggle from 'components/DarkModeToggle.vue';
 import DevTools from 'components/DevTools.vue';
