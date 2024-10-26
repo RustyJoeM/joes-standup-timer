@@ -4,11 +4,7 @@
     enter-active-class="animated zoomIn slower"
     leave-active="animated zoomOut slower"
   >
-    <q-card
-      v-if="tickerId || activeAttendant || nextAttendant"
-      @mouseenter="triggerDragHint()"
-      @mouseleave="leaveDragHint()"
-    >
+    <q-card v-if="tickerId || activeAttendant || nextAttendant">
       <q-card-section>
         <section class="row items-center justify-start" style="position: relative">
           <transition appear enter-active-class="animated pulse" mode="out-in">
@@ -49,10 +45,6 @@
             >
             </control-button>
           </section>
-
-          <div v-show="showDragHint" style="position: absolute; bottom: 0; right: 0">
-            <q-badge floating color="grey-5">(drag me if needed)</q-badge>
-          </div>
         </section>
       </q-card-section>
     </q-card>
@@ -161,24 +153,4 @@ const playLabel = computed(() => {
 const pauseLabel = computed(() => `Pause ${activeAttendant.value?.name.toLocaleUpperCase()}`);
 const finishLabel = computed(() => `Finish ${activeAttendant.value?.name.toLocaleUpperCase()}`);
 const nextLabel = computed(() => `Next: ${nextAttendant.value?.name.toLocaleUpperCase()}`);
-
-const showDragHint = ref(false);
-const hintActuallyExited = ref(false);
-
-const triggerDragHint = () => {
-  if (!hintActuallyExited.value) {
-    showDragHint.value = false;
-    return;
-  }
-  hintActuallyExited.value = false;
-  showDragHint.value = true;
-  setTimeout(() => {
-    showDragHint.value = false;
-  }, 2000);
-};
-
-const leaveDragHint = () => {
-  hintActuallyExited.value = true;
-  showDragHint.value = false;
-};
 </script>
