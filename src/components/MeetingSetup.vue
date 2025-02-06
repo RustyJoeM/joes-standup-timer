@@ -1,33 +1,31 @@
 <template>
-  <section>
-    <section class="row items-center">
+  <div class="column">
+    <header class="row items-center justify-between">
       <span class="text-h6">Meeting setup</span>
-      <q-space></q-space>
-      <q-btn flat icon="share" label="share setup" @click="setupToClipboard">
-        <q-tooltip>Copy current setup to URL link</q-tooltip>
+      <q-btn flat icon="share" label="share" @click="setupToClipboard" dense>
+        <q-tooltip :delay="500">Copy current setup to URL link</q-tooltip>
       </q-btn>
-    </section>
+    </header>
 
-    <section class="q-mt-md q-ml-md row items-baseline">
+    <section class="q-mt-md row items-baseline">
       <q-input
         type="number"
         :min="MIN_TALK_TIME_MS / 1000"
         v-model.number="secPerAttendant"
-        dense
         outlined
         label="Seconds per person"
-        class="col-2"
+        class="col"
       >
       </q-input>
 
       <q-input
         ref="newNameRef"
         v-model="newName"
-        dense
         outlined
+        hide-bottom-space
         label="Add name"
         @keyup.enter="addNewAttendant()"
-        class="q-ml-md col-3"
+        class="q-ml-md col"
         :rules="[(val) => nameAlreadyAdded(val) || 'Same name already added']"
       >
         <template #append>
@@ -42,7 +40,7 @@
         class="q-ml-md"
       ></q-checkbox>
     </section>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">

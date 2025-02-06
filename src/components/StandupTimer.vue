@@ -1,28 +1,28 @@
 <template>
-  <q-card>
-    <q-card-section>
+  <div class="column">
+    <q-card class="q-pa-lg">
       <meeting-setup :meeting-started="meetingHasStarted"></meeting-setup>
+    </q-card>
 
-      <q-separator class="q-mt-lg"></q-separator>
-
+    <q-card class="q-mt-md q-pa-md">
       <component :is="attendantsComponent" class="q-mt-lg"></component>
+    </q-card>
 
-      <q-page-sticky :offset="controlsPosition">
-        <meeting-controls v-touch-pan.prevent.mouse="moveControls"></meeting-controls>
-      </q-page-sticky>
+    <q-page-sticky :offset="controlsPosition">
+      <meeting-controls v-touch-pan.prevent.mouse="moveControls"></meeting-controls>
+    </q-page-sticky>
 
-      <transition
-        appear
-        enter-active-class="animated backInDown slow"
-        leave-active-class="animated backOutUp slow"
-      >
-        <section v-if="meetingHasFinished">
-          <q-separator class="q-mt-lg"></q-separator>
-          <meeting-results class="q-mt-lg"></meeting-results>
-        </section>
-      </transition>
-    </q-card-section>
-  </q-card>
+    <transition
+      appear
+      enter-active-class="animated backInDown slow"
+      leave-active-class="animated backOutUp slow"
+    >
+      <section v-if="meetingHasFinished">
+        <q-separator class="q-mt-lg"></q-separator>
+        <meeting-results class="q-mt-lg"></meeting-results>
+      </section>
+    </transition>
+  </div>
 </template>
 
 <script setup lang="ts">

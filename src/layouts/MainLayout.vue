@@ -3,7 +3,9 @@
     <q-header elevated>
       <q-toolbar>
         <section class="col">
-          <q-toolbar-title> RustyJoe's Standup Timer </q-toolbar-title>
+          <q-toolbar-title>
+            <span class="text-subtitle2">RustyJoe's</span> Standup Timer
+          </q-toolbar-title>
         </section>
 
         <section class="col row justify-center">
