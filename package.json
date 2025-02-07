@@ -13,16 +13,16 @@
     "build": "quasar build"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
+    "@quasar/extras": "^1.16.16",
     "@vueuse/core": "^10.9.0",
     "pinia": "^2.1.7",
-    "quasar": "^2.16.4",
+    "quasar": "^2.17.7",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.9.3",
+    "@quasar/app-vite": "^1.11.0",
     "@types/node": "^12.20.21",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
