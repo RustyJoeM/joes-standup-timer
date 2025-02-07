@@ -16,17 +16,12 @@
         </q-item-section>
 
         <q-menu dense anchor="top end" self="top start">
-          <q-item
-            v-for="(t, index) in meetingTemplates"
-            :key="index"
-            clickable
-            v-close-popup
-            @click="setupTemplate(t)"
-          >
+          <q-item v-for="(t, index) in meetingTemplates" :key="index" clickable v-close-popup @click="setupTemplate(t)">
             <template-view
               :template="t"
               @edit-label="editLabel(t, $event)"
               @remove-template="removeTemplate(index)"
+              class="col"
             ></template-view>
           </q-item>
         </q-menu>
@@ -45,13 +40,15 @@ import TemplateView from './TemplateView.vue';
 import { notifyMessage } from './NotifyHelper';
 
 const { addAttendant, resetMeeting } = useMeetingStore();
-const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
+const { spokenAttendants, waitingAttendants, msPerAttendant } = storeToRefs(useMeetingStore());
 
 const TEMPLATES_KEY = 'joes-standup-meeting';
 const meetingTemplates = useLocalStorage<MeetingTemplate[]>(TEMPLATES_KEY, []);
 
 const currentToTemplate = () => {
-  const names = attendants.value.map((att) => att.name);
+  const spokenNames = spokenAttendants.value.map((att) => att.name);
+  const waitingNames = waitingAttendants.value.map((att) => att.name);
+  const names = spokenNames.concat(...waitingNames);
   const withStr = names.length > 0 ? names.join(', ') : 'nobody';
   const label = `${Math.floor(msPerAttendant.value / 1000)} secs with ${withStr}`;
   const newTemplate: MeetingTemplate = {

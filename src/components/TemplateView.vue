@@ -1,19 +1,21 @@
 <template>
-  <section class="row items-center">
+  <section class="row items-center justify-between">
     <span>{{ template.label }}</span>
-    <q-badge outline color="grey" class="q-ml-md" @click.stop>
-      <q-icon name="edit" size="xs">
-        <q-tooltip :delay="500">Edit label</q-tooltip>
-        <q-popup-edit v-model="templateLabel" auto-save v-slot="scope">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
-        </q-popup-edit>
-      </q-icon>
-    </q-badge>
-    <q-badge outline color="grey" class="q-ml-sm" @click.stop>
-      <q-icon name="close" size="xs" @click="emit('remove-template')">
-        <q-tooltip :delay="500">Remove this template</q-tooltip>
-      </q-icon>
-    </q-badge>
+    <div class="q-ml-md row">
+      <q-badge outline color="grey" @click.stop>
+        <q-icon name="edit" size="xs">
+          <q-tooltip :delay="500">Edit label</q-tooltip>
+          <q-popup-edit v-model="templateLabel" auto-save v-slot="scope">
+            <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+          </q-popup-edit>
+        </q-icon>
+      </q-badge>
+      <q-badge outline color="grey" class="q-ml-sm" @click.stop>
+        <q-icon name="close" size="xs" @click="emit('remove-template')">
+          <q-tooltip :delay="500">Remove this template</q-tooltip>
+        </q-icon>
+      </q-badge>
+    </div>
   </section>
 </template>
 
