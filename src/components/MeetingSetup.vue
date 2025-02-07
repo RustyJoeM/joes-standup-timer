@@ -110,18 +110,20 @@ watch(
       msPerAttendant.value = queryProps.secs * 1000;
     }
     if (queryProps.names) {
-      waitingAttendants.value = queryProps.names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
+      const names = decodeURIComponent(queryProps.names);
+      waitingAttendants.value = names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
     }
   },
   { immediate: true }
 );
 
 const setupToClipboard = () => {
-  const path = window.location.origin;
+  const loc = window.location;
+  const path = `${loc.protocol}//${loc.host}${loc.pathname}`;
   const secs = '' + msPerAttendant.value / 1000;
   const allAttendants = spokenAttendants.value.concat(...waitingAttendants.value);
   const names = allAttendants.map((att) => att.name).join(NAME_SEPARATOR);
-  const url = `${path}/#/?secs=${secs}&names=${names}`;
+  const url = `${path}#/?secs=${secs}&names=${encodeURIComponent(names)}`;
   copyToClipboard(url);
   Notify.create({ position: 'bottom', type: 'info', message: 'URL copied to clipboard...' });
 };
