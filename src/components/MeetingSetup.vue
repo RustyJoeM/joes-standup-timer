@@ -26,19 +26,14 @@
         label="Add name"
         @keyup.enter="addNewAttendant()"
         class="q-ml-md col"
-        :rules="[(val) => nameAlreadyAdded(val) || 'Same name already added']"
+        :rules="[(val) => nameNotTaken(val) || 'Same name already added']"
       >
         <template #append>
           <q-btn dense flat icon="add" @click="addNewAttendant()"></q-btn>
         </template>
       </q-input>
 
-      <q-checkbox
-        v-model="doCapitalize"
-        dense
-        label="Capitalize first letter"
-        class="q-ml-md"
-      ></q-checkbox>
+      <q-checkbox v-model="doCapitalize" dense label="Capitalize first letter" class="q-ml-md"></q-checkbox>
     </section>
   </div>
 </template>
@@ -53,7 +48,7 @@ import { MIN_TALK_TIME_MS, newAttendant } from './AttendantModel';
 
 const newNameRef = ref<QInput | null>(null);
 
-const { attendants, msPerAttendant } = storeToRefs(useMeetingStore());
+const { spokenAttendants, waitingAttendants, msPerAttendant } = storeToRefs(useMeetingStore());
 const { addAttendant } = useMeetingStore();
 
 const cappedName = (name: string) => {
@@ -84,8 +79,11 @@ const newName = ref('');
 
 const doCapitalize = ref(true);
 
-const nameAlreadyAdded = (val: string) => {
-  return !attendants.value.some((att) => att.name == cappedName(val));
+const nameNotTaken = (val: string) => {
+  return (
+    !spokenAttendants.value.some((att) => att.name == cappedName(val)) &&
+    !waitingAttendants.value.some((att) => att.name == cappedName(val))
+  );
 };
 
 defineProps<{
@@ -112,7 +110,7 @@ watch(
       msPerAttendant.value = queryProps.secs * 1000;
     }
     if (queryProps.names) {
-      attendants.value = queryProps.names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
+      waitingAttendants.value = queryProps.names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
     }
   },
   { immediate: true }
@@ -121,7 +119,8 @@ watch(
 const setupToClipboard = () => {
   const path = window.location.origin;
   const secs = '' + msPerAttendant.value / 1000;
-  const names = attendants.value.map((att) => att.name).join(NAME_SEPARATOR);
+  const allAttendants = spokenAttendants.value.concat(...waitingAttendants.value);
+  const names = allAttendants.map((att) => att.name).join(NAME_SEPARATOR);
   const url = `${path}/#/?secs=${secs}&names=${names}`;
   copyToClipboard(url);
   Notify.create({ position: 'bottom', type: 'info', message: 'URL copied to clipboard...' });

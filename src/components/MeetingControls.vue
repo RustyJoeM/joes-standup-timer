@@ -1,9 +1,5 @@
 <template>
-  <transition
-    appear
-    enter-active-class="animated zoomIn slower"
-    leave-active="animated zoomOut slower"
-  >
+  <transition appear enter-active-class="animated zoomIn slower" leave-active="animated zoomOut slower">
     <q-card v-if="tickerId || activeAttendant || nextAttendant">
       <q-card-section>
         <section class="row items-center justify-start" style="position: relative">
@@ -25,7 +21,7 @@
             </transition>
           </section>
 
-          <section class="col q-ml-md" v-if="attendants.length > 0">
+          <section class="col q-ml-md" v-if="waitingAttendants.length > 0 || activeAttendantId">
             <control-button
               id="finish-button"
               v-if="activeAttendant"
@@ -60,14 +56,8 @@ import ControlButton from './ControlButton.vue';
 
 const { updateNextAttendant } = useMeetingStore();
 
-const {
-  attendants,
-  activeAttendant,
-  activeAttendantId,
-  nextAttendant,
-  tickSize,
-  runningMysteryMode,
-} = storeToRefs(useMeetingStore());
+const { spokenAttendants, waitingAttendants, activeAttendant, activeAttendantId, nextAttendant, tickSize } =
+  storeToRefs(useMeetingStore());
 
 const tickerId = ref<NodeJS.Timeout | undefined>(undefined);
 
@@ -129,13 +119,10 @@ const doNext = () => {
   if (nextAttendant.value) {
     notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
     activeAttendantId.value = nextAttendant.value._uid;
-    if (runningMysteryMode.value) {
-      // update position to preserve talking order
-      const finishedCnt = attendants.value.filter((att) => att.hasFinished).length;
-      const activeIndex = attendants.value.findIndex((att) => att._uid == activeAttendantId.value);
-      const activeAtt = attendants.value.splice(activeIndex, 1)[0];
-      attendants.value.splice(finishedCnt, 0, activeAtt);
-    }
+
+    const nextAttWaitIndex = waitingAttendants.value.findIndex((att) => att._uid == nextAttendant.value?._uid);
+    const n = waitingAttendants.value.splice(nextAttWaitIndex, 1)[0];
+    spokenAttendants.value.push(n);
     startTicker();
     return;
   }

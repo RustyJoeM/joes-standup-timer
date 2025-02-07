@@ -1,6 +1,6 @@
 <template>
   <q-checkbox v-model="displayMillis" label="Show milliseconds">
-    <q-tooltip>Show ms precision on timestamps</q-tooltip>
+    <q-tooltip :delay="500">Show ms precision on timestamps</q-tooltip>
   </q-checkbox>
 </template>
 

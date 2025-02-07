@@ -1,6 +1,6 @@
 <template>
   <q-checkbox v-model="runningMysteryMode" label="Mystery mode">
-    <q-tooltip>Randomize next talker for higher attention</q-tooltip>
+    <q-tooltip :delay="500">Randomize next talker for higher attention</q-tooltip>
   </q-checkbox>
 </template>
 

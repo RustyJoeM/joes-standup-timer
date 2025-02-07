@@ -3,21 +3,15 @@
     <span class="text-h6">Everyone has spoken </span>
 
     <section class="q-mt-md row items-center">
-      <q-input
-        dense
-        outlined
-        class="q-ml-md col-2"
-        :model-value="msToFormatted(totalElapsedMs, displayMillis)"
-        label="Total time taken"
-        readonly
-      ></q-input>
+      <span class="q-ml-md text-subtitle1">
+        Total time spent - "<span class="text-bold">{{ msToFormatted(totalElapsedMs, displayMillis) }} </span>".
+      </span>
 
       <template v-if="overdrawnMs">
-        <span class="q-ml-md">
-          The team took a bit longer (by {{ msToFormatted(overdrawnMs, displayMillis) }}) than
-          planned...
+        <span class="text-subtitle1">
+          &nbsp; The team took a bit longer (by {{ msToFormatted(overdrawnMs, displayMillis) }}) than planned...
         </span>
-        <transition mode="out-in" appear enter-active-class="animated heartBeat slower">
+        <transition mode="out-in" appear enter-active-class="animated heartBeat slower delay-2s">
           <q-icon
             name="heart_broken"
             size="md"
@@ -30,18 +24,11 @@
       </template>
 
       <template v-if="savedMs">
-        <span class="q-ml-md">
-          The team saved some time ({{ msToFormatted(savedMs, displayMillis) }}) in total!</span
-        >
-        <transition mode="out-in" appear enter-active-class="animated rubberBand slower">
-          <q-icon
-            name="celebration"
-            size="md"
-            color="positive"
-            class="q-ml-md"
-            :key="negCounter"
-            @click="negCounter++"
-          ></q-icon>
+        <span class="text-subtitle1">
+          &nbsp; The team saved some time ({{ msToFormatted(savedMs, displayMillis) }}) in total!
+        </span>
+        <transition mode="out-in" appear enter-active-class="animated rubberBand slower delay-2s">
+          <q-icon name="star" size="md" color="amber" class="q-ml-md" :key="negCounter" @click="negCounter++"></q-icon>
         </transition>
       </template>
     </section>
@@ -51,7 +38,7 @@
 
       <min-max-award-chip
         class="q-ml-md q-mt-md"
-        :attendants="attendants"
+        :attendants="spokenAttendants"
         :title-pool="MIN_TIME_TITLES"
         reason="using the least time"
         mode="min"
@@ -62,7 +49,7 @@
 
       <min-max-award-chip
         class="q-ml-md q-mt-md"
-        :attendants="attendants"
+        :attendants="spokenAttendants"
         :title-pool="MAX_TIME_TITLES"
         reason="the good use of large slice of meeting"
         mode="max"
@@ -82,19 +69,19 @@ import { msToFormatted } from './AttendantModel';
 
 import MinMaxAwardChip from './MinMaxAwardChip.vue';
 
-const { attendants, msPerAttendant, displayMillis } = storeToRefs(useMeetingStore());
+const { spokenAttendants, msPerAttendant, displayMillis } = storeToRefs(useMeetingStore());
 
 // animation keys
 const posCounter = ref(0);
 const negCounter = ref(0);
 
 const totalElapsedMs = computed(() => {
-  return attendants.value
+  return spokenAttendants.value
     .map((att) => att.msElapsed)
     .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 });
 
-const plannedMs = computed(() => attendants.value.length * msPerAttendant.value);
+const plannedMs = computed(() => spokenAttendants.value.length * msPerAttendant.value);
 
 const overdrawnMs = computed(() =>
   totalElapsedMs.value > plannedMs.value ? totalElapsedMs.value - plannedMs.value : undefined
