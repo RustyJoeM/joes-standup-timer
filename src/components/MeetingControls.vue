@@ -25,7 +25,7 @@
             <control-button
               id="finish-button"
               v-if="activeAttendant"
-              color="primary"
+              color="secondary"
               icon="check"
               :label="finishLabel"
               @click="finishActive()"

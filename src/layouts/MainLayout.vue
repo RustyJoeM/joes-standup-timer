@@ -4,20 +4,18 @@
       <q-toolbar>
         <section class="col">
           <q-toolbar-title>
-            <span class="text-subtitle2">RustyJoe's</span> Standup Timer
+            <span class="text-subtitle2" style="opacity: 0.25">RustyJoe's</span> Standup Timer
           </q-toolbar-title>
         </section>
 
-        <section class="col row justify-center">
+        <section class="col row justify-evenly">
           <template-manager></template-manager>
+          <mystery-mode-toggle></mystery-mode-toggle>
         </section>
 
         <section class="col row justify-end">
-          <mystery-mode-toggle></mystery-mode-toggle>
-          <q-separator vertical class="q-ml-sm"></q-separator>
-
-          <dark-mode-toggle dense size="md" :class="GUTTER_CLASS"></dark-mode-toggle>
-          <dev-tools :class="GUTTER_CLASS"></dev-tools>
+          <dark-mode-toggle size="md" :class="GUTTER_CLASS"></dark-mode-toggle>
+          <!-- <dev-tools :class="GUTTER_CLASS"></dev-tools> -->
         </section>
       </q-toolbar>
     </q-header>
@@ -32,7 +30,6 @@
 import TemplateManager from 'components/TemplateManager.vue';
 import MysteryModeToggle from 'components/MysteryModeToggle.vue';
 import DarkModeToggle from 'components/DarkModeToggle.vue';
-import DevTools from 'components/DevTools.vue';
 
 const GUTTER_CLASS = 'q-ml-md';
 </script>
