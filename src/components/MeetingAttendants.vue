@@ -29,7 +29,7 @@
           <q-tooltip :delay="500">Reset elapsed times of all attendants</q-tooltip>
         </q-btn>
 
-        <q-btn dense icon="close" label="Delete" @click="resetMeeting()" class="q-ml-md">
+        <q-btn dense icon="close" label="Delete" @click="resetMeetingDialog" class="q-ml-md">
           <q-tooltip :delay="500">Delete all participants</q-tooltip>
         </q-btn>
       </div>
@@ -97,6 +97,7 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
+import { useQuasar } from 'quasar';
 
 import AttendantView from './AttendantView.vue';
 import AttendantChip from './AttendantChip.vue';
@@ -129,5 +130,17 @@ const reorderedWaiting = ({ oldIndex, newIndex }: { oldIndex: number; newIndex: 
   if (oldIndex == 0 || newIndex == 0) {
     updateNextAttendant();
   }
+};
+
+const $q = useQuasar();
+
+const resetMeetingDialog = () => {
+  $q.dialog({
+    title: 'Delete all attendants',
+    message: 'Would you like to delete all meeting attendants?',
+    cancel: true,
+  }).onOk(() => {
+    resetMeeting();
+  });
 };
 </script>

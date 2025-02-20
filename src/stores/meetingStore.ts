@@ -17,6 +17,7 @@ export const useMeetingStore = defineStore('meeting', {
 
     activeAttendantId: undefined as AttendantId | undefined,
     nextAttendantId: undefined as AttendantId | undefined,
+    tickerId: undefined as NodeJS.Timeout | undefined,
 
     meetingTemplates: [] as MeetingTemplate[],
   }),
@@ -48,6 +49,10 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     resetMeeting() {
+      if (this.tickerId != undefined) {
+        clearInterval(this.tickerId);
+        this.tickerId = undefined;
+      }
       this.spokenAttendants = [];
       this.waitingAttendants = [];
       this.activeAttendantId = undefined;
@@ -55,6 +60,10 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     resetTimes() {
+      if (this.tickerId != undefined) {
+        clearInterval(this.tickerId);
+        this.tickerId = undefined;
+      }
       this.activeAttendantId = undefined;
       this.waitingAttendants = this.waitingAttendants.concat(...this.spokenAttendants);
       this.spokenAttendants = [];
@@ -95,6 +104,9 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     updateNextAttendant() {
+      if (this.tickerId) return; // do no change when time is running
+      if (!this.tickerId && this.activeAttendantId) return; // paused talker
+
       if (!this.runningMysteryMode) {
         const attendant = this.waitingAttendants[0] ?? undefined;
         this.nextAttendantId = attendant ? attendant?._uid : undefined;

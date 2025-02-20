@@ -56,10 +56,8 @@ import ControlButton from './ControlButton.vue';
 
 const { updateNextAttendant } = useMeetingStore();
 
-const { spokenAttendants, waitingAttendants, activeAttendant, activeAttendantId, nextAttendant, tickSize } =
+const { spokenAttendants, waitingAttendants, activeAttendant, activeAttendantId, nextAttendant, tickSize, tickerId } =
   storeToRefs(useMeetingStore());
-
-const tickerId = ref<NodeJS.Timeout | undefined>(undefined);
 
 const lastTickMs = ref<number | undefined>(undefined);
 
