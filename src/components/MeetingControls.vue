@@ -2,7 +2,7 @@
   <transition appear enter-active-class="animated zoomIn slower" leave-active="animated zoomOut slower">
     <q-card v-if="tickerId || activeAttendant || nextAttendant">
       <q-card-section>
-        <section class="row items-center justify-start" style="position: relative">
+        <section class="row no-wrap items-center justify-start" style="position: relative">
           <transition appear enter-active-class="animated pulse" mode="out-in">
             <span v-if="activeAttendant" class="text-subtitle1" :key="'' + tickerId">
               {{ activeAttendant.name }} is {{ tickerId ? 'talking' : 'having a pause' }}.

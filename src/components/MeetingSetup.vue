@@ -49,7 +49,7 @@ import { MIN_TALK_TIME_MS, newAttendant } from './AttendantModel';
 const newNameRef = ref<QInput | null>(null);
 
 const { spokenAttendants, waitingAttendants, msPerAttendant } = storeToRefs(useMeetingStore());
-const { addAttendant } = useMeetingStore();
+const { addAttendant, updateNextAttendant } = useMeetingStore();
 
 const cappedName = (name: string) => {
   if (doCapitalize.value) {
@@ -112,6 +112,7 @@ watch(
     if (queryProps.names) {
       const names = decodeURIComponent(queryProps.names);
       waitingAttendants.value = names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
+      updateNextAttendant();
     }
   },
   { immediate: true }
