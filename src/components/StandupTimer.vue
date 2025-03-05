@@ -41,12 +41,8 @@ const meetingHasFinished = computed(
 
 const controlsPosition = ref([32, 32]);
 
-const draggingControls = ref(false);
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const moveControls = (ev: any) => {
-  draggingControls.value = ev.isFirst !== true && ev.isFinal !== true;
-
   controlsPosition.value = [controlsPosition.value[0] - ev.delta.x, controlsPosition.value[1] - ev.delta.y];
 };
 </script>
