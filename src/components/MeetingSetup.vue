@@ -49,7 +49,7 @@ import { MIN_TALK_TIME_MS } from './AttendantModel';
 const newNameRef = ref<QInput | null>(null);
 
 const { allAttendantNames, msPerAttendant } = storeToRefs(useMeetingStore());
-const { addAttendant, updateNextAttendant } = useMeetingStore();
+const { addAttendant, updateNextAttendant, resetMeeting } = useMeetingStore();
 
 const cappedName = (name: string) => {
   if (doCapitalize.value) {
@@ -102,6 +102,7 @@ interface SetupQueryProps {
 watch(
   () => route.query,
   (newQuery) => {
+    resetMeeting();
     const queryProps = newQuery as unknown as SetupQueryProps;
     if (queryProps.secs) {
       msPerAttendant.value = queryProps.secs * 1000;

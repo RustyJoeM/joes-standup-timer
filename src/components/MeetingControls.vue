@@ -1,48 +1,48 @@
 <template>
   <transition appear enter-active-class="animated zoomIn slower" leave-active="animated zoomOut slower">
-    <q-card v-if="tickerId || activeAttendant || nextAttendant">
-      <q-card-section>
-        <section class="row no-wrap items-center justify-start" style="position: relative">
+    <q-card v-if="tickerId || activeAttendant || nextAttendant" class="q-pa-md">
+      <section class="row items-center">
+        <div>
           <transition appear enter-active-class="animated pulse" mode="out-in">
             <span v-if="activeAttendant" class="text-subtitle1" :key="'' + tickerId">
               {{ activeAttendant.name }} is {{ tickerId ? 'talking' : 'having a pause' }}.
             </span>
             <span v-else class="text-subtitle1">No one talking now.</span>
           </transition>
+        </div>
 
-          <section class="q-ml-md" v-if="activeAttendant">
-            <transition appear enter-active-class="animated pulse slower" mode="out-in">
-              <control-button id="pause-button" v-if="tickerId" icon="pause" @click="doPause()">
-                <q-tooltip :delay="2000">{{ pauseLabel }}</q-tooltip>
-              </control-button>
-              <control-button id="resume-button" v-else icon="replay" @click="doResume()">
-                <q-tooltip :delay="2000">{{ playLabel }}</q-tooltip>
-              </control-button>
-            </transition>
-          </section>
-
-          <section class="col q-ml-md" v-if="waitingAttendants.length > 0 || activeAttendantId">
-            <control-button
-              id="finish-button"
-              v-if="activeAttendant"
-              color="secondary"
-              icon="check"
-              :label="finishLabel"
-              @click="finishActive()"
-            >
+        <section class="q-ml-md" v-if="activeAttendant">
+          <transition appear enter-active-class="animated pulse slower" mode="out-in">
+            <control-button id="pause-button" v-if="tickerId" icon="pause" @click="doPause()">
+              <q-tooltip :delay="2000">{{ pauseLabel }}</q-tooltip>
             </control-button>
-            <control-button
-              id="start-next-button"
-              v-else
-              color="primary"
-              icon="skip_next"
-              :label="nextLabel"
-              @click="doNext()"
-            >
+            <control-button id="resume-button" v-else icon="replay" @click="doResume()">
+              <q-tooltip :delay="2000">{{ playLabel }}</q-tooltip>
             </control-button>
-          </section>
+          </transition>
         </section>
-      </q-card-section>
+
+        <section class="col q-ml-md" v-if="waitingAttendants.length > 0 || activeAttendantId">
+          <control-button
+            id="finish-button"
+            v-if="activeAttendant"
+            color="secondary"
+            icon="check"
+            :label="finishLabel"
+            @click="finishActive()"
+          >
+          </control-button>
+          <control-button
+            id="start-next-button"
+            v-else
+            color="primary"
+            icon="skip_next"
+            :label="nextLabel"
+            @click="doNext()"
+          >
+          </control-button>
+        </section>
+      </section>
     </q-card>
   </transition>
 </template>
