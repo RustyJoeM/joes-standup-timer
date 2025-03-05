@@ -2,16 +2,16 @@
   <section class="column">
     <header class="row items-center justify-between">
       <section class="text-h6">
-        <template v-if="totalAttendants > 0">
+        <template v-if="presentAttendants > 0">
           <span>
-            {{ totalAttendants }} {{ totalAttendants > 1 ? 'people' : ' person' }} attending -
+            {{ presentAttendants }} {{ presentAttendants > 1 ? 'people' : ' person' }} attending -
             {{ estimatedTotalTime }} in total
           </span>
         </template>
-        <span v-else>No attendants set up yet</span>
+        <span v-else>No present or setup attendants yet.</span>
       </section>
 
-      <div v-if="totalAttendants > 0" class="row items-center">
+      <div v-if="presentAttendants > 0" class="row items-center">
         <transition appear enter-active-class="animated shakeY slower">
           <q-btn v-if="waitingAttendants.length > 1" dense icon="shuffle" label="shuffle" @click="doShuffle()">
             <q-tooltip :delay="500">Shuffle waiting speakers</q-tooltip>
@@ -48,13 +48,15 @@
               :key="attendant._uid"
               :attendant="attendant"
               :is-active="attendant._uid == activeAttendantId"
+              :allowCheckout="false"
+              class="q-mt-md"
             ></attendant-view>
           </transition-group>
         </section>
       </section>
     </template>
 
-    <section v-if="waitingAttendants.length > 0" id="waiting-attendants" class="q-mt-md column">
+    <section v-if="waitingAttendants.length > 0" id="waiting-attendants" class="q-mt-lg column">
       <span class="text-subtitle1">Waiting to talk:</span>
 
       <template v-if="!runningMysteryMode">
@@ -62,14 +64,19 @@
           <draggable :list="waitingAttendants" item-key="_uid" class="col-9" @update="reorderedWaiting">
             <template #item="{ element }: { element: Attendant, index: number }">
               <transition appear enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
-                <attendant-view :attendant="element" :is-active="element._uid == activeAttendantId"></attendant-view>
+                <attendant-view
+                  :attendant="element"
+                  :is-active="element._uid == activeAttendantId"
+                  :allow-checkout="true"
+                  class="q-mt-sm"
+                ></attendant-view>
               </transition>
             </template>
           </draggable>
         </section>
         <transition mode="out-in" enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
           <section v-if="!runningMysteryMode && waitingAttendants.length > 1" class="q-mt-sm row justify-center">
-            <span class="col-9">(drag around to reorder)</span>
+            <span>(drag around to reorder)</span>
           </section>
         </transition>
       </template>
@@ -80,14 +87,43 @@
           leave-active-class="animated bounceOut slow"
         >
           <div v-for="att of waitingAttendants" :key="att._uid" class="q-ml-md">
-            <attendant-chip :attendant="att" size="lg">
-              <q-btn class="q-ml-md" dense icon="close" size="xs" @click="removeAttendant(att._uid)"></q-btn>
+            <q-card class="q-mt-sm">
+              <!-- extra q-card for floating badge anchoring! -->
+              <q-linear-progress size="3rem" rounded class="row items-center">
+                <attendant-chip :attendant="att" class="q-ml-md"></attendant-chip>
+                <absence-toggle-button
+                  :perform="'check-out'"
+                  :uid="att._uid"
+                  size="sm"
+                  class="q-ml-lg"
+                ></absence-toggle-button>
+                <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
+              </q-linear-progress>
               <transition appear enter-active-class="animated heartBeat slow">
                 <q-badge floating v-if="att._uid == nextAttendantId">NEXT</q-badge>
               </transition>
-            </attendant-chip>
+            </q-card>
           </div>
         </transition-group>
+      </div>
+    </section>
+
+    <section v-if="absentAttendants.length > 0" class="q-mt-md">
+      <span class="text-subtitle1">Postponed / absent talkers:</span>
+
+      <div class="row">
+        <div v-for="att of absentAttendants" :key="att._uid" class="q-ml-md">
+          <q-linear-progress size="3rem" rounded class="row items-center q-mt-md">
+            <attendant-chip :attendant="att" class="q-ml-sm"></attendant-chip>
+            <absence-toggle-button
+              :perform="'check-in'"
+              :uid="att._uid"
+              size="sm"
+              class="q-ml-lg"
+            ></absence-toggle-button>
+            <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
+          </q-linear-progress>
+        </div>
       </div>
     </section>
   </section>
@@ -104,17 +140,27 @@ import AttendantChip from './AttendantChip.vue';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Attendant, msToFormatted } from './AttendantModel';
 
-const { shuffleAttendants, resetTimes, resetMeeting, updateNextAttendant, removeAttendant } = useMeetingStore();
+import AbsenceToggleButton from './AbsenceToggleButton.vue';
+import AttendantRemoveButton from './AttendantRemoveButton.vue';
 
-const { waitingAttendants, spokenAttendants, msPerAttendant, activeAttendantId, runningMysteryMode, nextAttendantId } =
-  storeToRefs(useMeetingStore());
+const { shuffleAttendants, resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
 
-const totalAttendants = computed(() => {
+const {
+  waitingAttendants,
+  spokenAttendants,
+  absentAttendants,
+  msPerAttendant,
+  activeAttendantId,
+  runningMysteryMode,
+  nextAttendantId,
+} = storeToRefs(useMeetingStore());
+
+const presentAttendants = computed(() => {
   return spokenAttendants.value.length + waitingAttendants.value.length;
 });
 
 const estimatedTotalTime = computed(() => {
-  const msTotal = msPerAttendant.value * totalAttendants.value;
+  const msTotal = msPerAttendant.value * presentAttendants.value;
   return msToFormatted(msTotal, false);
 });
 

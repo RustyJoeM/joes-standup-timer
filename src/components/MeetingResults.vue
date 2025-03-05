@@ -34,7 +34,7 @@
     </section>
 
     <section class="q-mt-lg">
-      <span class="text-h6">Noteworthy heroes of the meeting </span>
+      <span class="text-h6">Noteworthy heroes of the meeting:</span>
 
       <min-max-award-chip
         class="q-ml-md q-mt-md"
@@ -58,6 +58,13 @@
         <template #rivet><q-spinner-infinity size="2rem"></q-spinner-infinity></template>
       </min-max-award-chip>
     </section>
+
+    <section v-if="absentAttendants.length > 0" class="q-mt-lg column">
+      <span class="text-h6">{{
+        absentAttendants.length > 1 ? 'Voices that were not headerd:' : 'Unheared voice:'
+      }}</span>
+      <span class="q-ml-md q-mt-md">{{ absentAttendants.map((att) => att.name).join(', ') }} </span>
+    </section>
   </section>
 </template>
 
@@ -69,7 +76,7 @@ import { msToFormatted } from './AttendantModel';
 
 import MinMaxAwardChip from './MinMaxAwardChip.vue';
 
-const { spokenAttendants, msPerAttendant, displayMillis } = storeToRefs(useMeetingStore());
+const { spokenAttendants, absentAttendants, msPerAttendant, displayMillis } = storeToRefs(useMeetingStore());
 
 // animation keys
 const posCounter = ref(0);

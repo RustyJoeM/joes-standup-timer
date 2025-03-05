@@ -5,6 +5,8 @@ import { MeetingTemplate } from 'src/components/TemplateModel';
 
 const TICK_INTERVAL_MS = 100;
 
+const ATTENDANT_GROUPS = ['waitingAttendants', 'spokenAttendants', 'absentAttendants'] as const;
+
 export const useMeetingStore = defineStore('meeting', {
   state: () => ({
     tickSize: TICK_INTERVAL_MS,
@@ -12,8 +14,9 @@ export const useMeetingStore = defineStore('meeting', {
     displayMillis: false,
     runningMysteryMode: false,
 
-    spokenAttendants: [] as Attendant[],
-    waitingAttendants: [] as Attendant[],
+    spokenAttendants: [] as Attendant[], // people that have spoken (or are speakign currently)
+    waitingAttendants: [] as Attendant[], // people in the meeting waiting for their turn
+    absentAttendants: [] as Attendant[], // people expected in meeting but not present / to be picked as "next" to talk
 
     activeAttendantId: undefined as AttendantId | undefined,
     nextAttendantId: undefined as AttendantId | undefined,
@@ -31,6 +34,12 @@ export const useMeetingStore = defineStore('meeting', {
     nextAttendant: (state): Attendant | undefined => {
       if (!state.nextAttendantId) return undefined;
       return state.waitingAttendants.find((att) => att._uid == state.nextAttendantId);
+    },
+
+    allAttendantNames: (state): string[] => {
+      let res: string[] = [];
+      for (const group of ATTENDANT_GROUPS) res = res.concat(state[group].map((att) => att.name));
+      return res;
     },
   },
 
@@ -53,8 +62,7 @@ export const useMeetingStore = defineStore('meeting', {
         clearInterval(this.tickerId);
         this.tickerId = undefined;
       }
-      this.spokenAttendants = [];
-      this.waitingAttendants = [];
+      for (const group of ATTENDANT_GROUPS) this[group] = [];
       this.activeAttendantId = undefined;
       this.nextAttendantId = undefined;
     },
@@ -76,14 +84,14 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     renameAttendant(uid: string, name: string) {
-      let att = this.waitingAttendants.find((att) => att._uid == uid);
-      if (att) {
-        att.name = name;
-        return;
+      for (const prop of ATTENDANT_GROUPS) {
+        const att = this[prop].find((att) => att._uid == uid);
+        if (att) {
+          att.name = name;
+          return;
+        }
       }
-      att = this.spokenAttendants.find((att) => att._uid == uid);
-      if (!att) throw "Couldn't find attendant to rename!";
-      att.name = name;
+      throw "Couldn't find attendant to rename!";
     },
 
     removeAttendant(uid: string) {
@@ -91,15 +99,23 @@ export const useMeetingStore = defineStore('meeting', {
         notifyMessage('warning', "Won't delete current talker...");
         return;
       }
-      const index = this.waitingAttendants.findIndex((att) => att._uid == uid);
-      if (index != -1) {
-        this.waitingAttendants.splice(index, 1);
-      } else {
-        const index = this.spokenAttendants.findIndex((att) => att._uid == uid);
+      for (const group of ATTENDANT_GROUPS) {
+        const index = this[group].findIndex((att) => att._uid == uid);
         if (index != -1) {
-          this.spokenAttendants.splice(index, 1);
+          this[group].splice(index, 1);
+          this.updateNextAttendant();
+          return;
         }
       }
+    },
+
+    toggleAttendantAbsence(uid: string, perform: 'check-in' | 'check-out') {
+      const from = perform == 'check-in' ? this.absentAttendants : this.waitingAttendants;
+      const to = perform == 'check-in' ? this.waitingAttendants : this.absentAttendants;
+      const index = from.findIndex((att) => att._uid == uid);
+      if (index < 0) throw `Couldn't find attendant to ${perform}`;
+      const checkedIn = { ...from.splice(index, 1)[0] };
+      to.push(checkedIn);
       this.updateNextAttendant();
     },
 

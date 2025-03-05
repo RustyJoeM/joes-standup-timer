@@ -40,16 +40,18 @@ import TemplateView from './TemplateView.vue';
 import { notifyMessage } from './NotifyHelper';
 
 const { addAttendant, resetMeeting } = useMeetingStore();
-const { spokenAttendants, waitingAttendants, msPerAttendant } = storeToRefs(useMeetingStore());
+const { allAttendantNames, msPerAttendant } = storeToRefs(useMeetingStore());
 
 const TEMPLATES_KEY = 'joes-standup-meeting';
 const meetingTemplates = useLocalStorage<MeetingTemplate[]>(TEMPLATES_KEY, []);
 
 const currentToTemplate = () => {
-  const spokenNames = spokenAttendants.value.map((att) => att.name);
-  const waitingNames = waitingAttendants.value.map((att) => att.name);
-  const names = spokenNames.concat(...waitingNames);
-  const withStr = names.length > 0 ? names.join(', ') : 'nobody';
+  const names = allAttendantNames.value;
+  if (names.length < 1) {
+    notifyMessage('warning', 'No attendants to export!');
+    return;
+  }
+  const withStr = `${names.length} people`;
   const label = `${Math.floor(msPerAttendant.value / 1000)} secs with ${withStr}`;
   const newTemplate: MeetingTemplate = {
     label,

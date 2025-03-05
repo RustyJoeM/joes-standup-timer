@@ -6,11 +6,10 @@
     :animation-speed="animSpeed"
     :stripe="isActive"
     rounded
-    class="q-mt-sm"
   >
     <div class="absolute-full flex flex-center row">
-      <div class="col-12 row items-center q-px-md">
-        <section class="col row justify-start">
+      <div class="col-12 row items-center">
+        <section class="q-ml-sm col row justify-start">
           <attendant-chip :attendant="attendant"></attendant-chip>
         </section>
         <section class="col row justify-center">
@@ -24,14 +23,13 @@
           />
         </section>
         <section class="col row justify-end">
-          <q-btn
-            dense
-            :color="CHIP_COLOR"
-            icon="close"
-            :text-color="TEXT_COLOR"
+          <absence-toggle-button
+            v-if="props.allowCheckout"
+            :perform="'check-out'"
+            :uid="attendant._uid"
             size="sm"
-            @click="removeAttendant(attendant._uid)"
-          ></q-btn>
+          ></absence-toggle-button>
+          <attendant-remove-button :uid="attendant._uid" class="q-ml-md q-mr-md" size="sm"></attendant-remove-button>
         </section>
       </div>
     </div>
@@ -46,12 +44,14 @@ import { Attendant, msToFormatted } from './AttendantModel';
 import AttendantChip from './AttendantChip.vue';
 import { useAttendantStyling } from './AttendantStyling';
 
+import AbsenceToggleButton from './AbsenceToggleButton.vue';
+import AttendantRemoveButton from './AttendantRemoveButton.vue';
+
 const props = defineProps<{
   attendant: Attendant;
   isActive: boolean;
+  allowCheckout: boolean;
 }>();
-
-const { removeAttendant } = useMeetingStore();
 
 const { msPerAttendant, tickSize, displayMillis } = storeToRefs(useMeetingStore());
 

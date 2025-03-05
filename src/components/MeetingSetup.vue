@@ -44,11 +44,11 @@ import { storeToRefs } from 'pinia';
 import { Notify, QInput, copyToClipboard } from 'quasar';
 
 import { useMeetingStore } from 'src/stores/meetingStore';
-import { MIN_TALK_TIME_MS, newAttendant } from './AttendantModel';
+import { MIN_TALK_TIME_MS } from './AttendantModel';
 
 const newNameRef = ref<QInput | null>(null);
 
-const { spokenAttendants, waitingAttendants, msPerAttendant } = storeToRefs(useMeetingStore());
+const { allAttendantNames, msPerAttendant } = storeToRefs(useMeetingStore());
 const { addAttendant, updateNextAttendant } = useMeetingStore();
 
 const cappedName = (name: string) => {
@@ -80,10 +80,7 @@ const newName = ref('');
 const doCapitalize = ref(true);
 
 const nameNotTaken = (val: string) => {
-  return (
-    !spokenAttendants.value.some((att) => att.name == cappedName(val)) &&
-    !waitingAttendants.value.some((att) => att.name == cappedName(val))
-  );
+  return !allAttendantNames.value.some((name) => name == cappedName(val));
 };
 
 defineProps<{
@@ -110,8 +107,8 @@ watch(
       msPerAttendant.value = queryProps.secs * 1000;
     }
     if (queryProps.names) {
-      const names = decodeURIComponent(queryProps.names);
-      waitingAttendants.value = names.split(NAME_SEPARATOR).map((name) => newAttendant(name));
+      const namesStr = decodeURIComponent(queryProps.names);
+      namesStr.split(NAME_SEPARATOR).forEach((name) => addAttendant(name));
       updateNextAttendant();
     }
   },
@@ -122,9 +119,9 @@ const setupToClipboard = () => {
   const loc = window.location;
   const path = `${loc.protocol}//${loc.host}${loc.pathname}`;
   const secs = '' + msPerAttendant.value / 1000;
-  const allAttendants = spokenAttendants.value.concat(...waitingAttendants.value);
-  const names = allAttendants.map((att) => att.name).join(NAME_SEPARATOR);
-  const url = `${path}#/?secs=${secs}&names=${encodeURIComponent(names)}`;
+  // TODO preserve present/absent groups?
+  const namesStr = allAttendantNames.value.join(NAME_SEPARATOR);
+  const url = `${path}#/?secs=${secs}&names=${encodeURIComponent(namesStr)}`;
   copyToClipboard(url);
   Notify.create({ position: 'bottom', type: 'info', message: 'URL copied to clipboard...' });
 };
