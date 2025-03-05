@@ -26,7 +26,7 @@
         label="Add name"
         @keyup.enter="addNewAttendant()"
         class="q-ml-md col"
-        :rules="[(val) => nameNotTaken(val) || 'Same name already added']"
+        :rules="[(val) => nameNotTaken(cappedName(val)) || 'Same name already added']"
       >
         <template #append>
           <q-btn dense flat icon="add" @click="addNewAttendant()"></q-btn>
@@ -49,7 +49,7 @@ import { MIN_TALK_TIME_MS } from './AttendantModel';
 const newNameRef = ref<QInput | null>(null);
 
 const { allAttendantNames, msPerAttendant } = storeToRefs(useMeetingStore());
-const { addAttendant, updateNextAttendant, resetMeeting } = useMeetingStore();
+const { addAttendant, updateNextAttendant, resetMeeting, nameNotTaken } = useMeetingStore();
 
 const cappedName = (name: string) => {
   if (doCapitalize.value) {
@@ -78,10 +78,6 @@ const secPerAttendant = computed({
 const newName = ref('');
 
 const doCapitalize = ref(true);
-
-const nameNotTaken = (val: string) => {
-  return !allAttendantNames.value.some((name) => name == cappedName(val));
-};
 
 defineProps<{
   meetingStarted: boolean;

@@ -136,5 +136,13 @@ export const useMeetingStore = defineStore('meeting', {
       const randomIndex = (Math.random() * this.waitingAttendants.length) | 0;
       this.nextAttendantId = this.waitingAttendants[randomIndex]._uid;
     },
+
+    nameNotTaken(val: string, exceptUid?: string) {
+      if (exceptUid == undefined) return !this.allAttendantNames.some((name) => name == val);
+      for (const group of ATTENDANT_GROUPS) {
+        if (this[group].filter((att) => att._uid != exceptUid).some((att) => att.name == val)) return false;
+      }
+      return true;
+    },
   },
 });

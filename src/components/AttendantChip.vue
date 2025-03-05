@@ -1,8 +1,16 @@
 <template>
   <q-chip square :color="CHIP_COLOR">
     <span :class="`text-subtitle1 text-${TEXT_COLOR}`">{{ attendant.name }}</span>
-    <q-popup-edit v-model="attendantName" auto-save v-slot="scope">
-      <q-input filled v-model="scope.value" dense autofocus @keyup.enter="scope.set" />
+    <q-popup-edit v-model="attendantName" auto-save v-slot="scope" :validate="validateRename">
+      <q-input
+        filled
+        v-model="scope.value"
+        dense
+        autofocus
+        hide-bottom-space
+        @keyup.enter="scope.set"
+        :rules="[(val) => nameNotTaken(val, attendant._uid) || 'Same name already exists']"
+      />
     </q-popup-edit>
     <slot />
   </q-chip>
@@ -18,7 +26,7 @@ const props = defineProps<{
   attendant: Attendant;
 }>();
 
-const { renameAttendant } = useMeetingStore();
+const { renameAttendant, nameNotTaken } = useMeetingStore();
 
 const attendantName = computed({
   get: () => props.attendant.name,
@@ -26,4 +34,8 @@ const attendantName = computed({
 });
 
 const { CHIP_COLOR, TEXT_COLOR } = useAttendantStyling();
+
+const validateRename = (val: string) => {
+  return nameNotTaken(val, props.attendant._uid);
+};
 </script>
