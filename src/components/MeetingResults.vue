@@ -13,11 +13,11 @@
         </span>
         <transition mode="out-in" appear enter-active-class="animated heartBeat slower delay-2s">
           <q-icon
+            :key="posCounter"
             name="heart_broken"
             size="md"
             color="negative"
             class="q-ml-md"
-            :key="posCounter"
             @click="posCounter++"
           ></q-icon>
         </transition>
@@ -28,7 +28,7 @@
           &nbsp; The team saved some time ({{ msToFormatted(savedMs, displayMillis) }}) in total!
         </span>
         <transition mode="out-in" appear enter-active-class="animated rubberBand slower delay-2s">
-          <q-icon name="star" size="md" color="amber" class="q-ml-md" :key="negCounter" @click="negCounter++"></q-icon>
+          <q-icon :key="negCounter" name="star" size="md" color="amber" class="q-ml-md" @click="negCounter++"></q-icon>
         </transition>
       </template>
     </section>
@@ -63,7 +63,7 @@
       <span class="text-h6">{{
         absentAttendants.length > 1 ? 'Voices that were not headerd:' : 'Unheared voice:'
       }}</span>
-      <span class="q-ml-md q-mt-md">{{ absentAttendants.map((att) => att.name).join(', ') }} </span>
+      <span class="q-ml-md q-mt-md">{{ absentAttendants.map((att: Attendant) => att.name).join(', ') }} </span>
     </section>
   </section>
 </template>
@@ -72,7 +72,7 @@
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { computed, ref } from 'vue';
-import { msToFormatted } from './AttendantModel';
+import { Attendant, msToFormatted } from './AttendantModel';
 
 import MinMaxAwardChip from './MinMaxAwardChip.vue';
 

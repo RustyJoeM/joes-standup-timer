@@ -2,16 +2,16 @@
   <div class="column">
     <header class="row items-center justify-between">
       <span class="text-h6">Meeting setup</span>
-      <q-btn flat icon="share" label="share" @click="setupToClipboard" dense>
+      <q-btn flat icon="share" label="share" dense @click="setupToClipboard">
         <q-tooltip :delay="500">Copy current setup to URL link</q-tooltip>
       </q-btn>
     </header>
 
     <section class="q-mt-md row items-baseline">
       <q-input
+        v-model.number="secPerAttendant"
         type="number"
         :min="MIN_TALK_TIME_MS / 1000"
-        v-model.number="secPerAttendant"
         outlined
         label="Seconds per person"
         class="col"
@@ -24,9 +24,9 @@
         outlined
         hide-bottom-space
         label="Add name"
-        @keyup.enter="addNewAttendant()"
         class="q-ml-md col"
-        :rules="[(val) => nameNotTaken(cappedName(val)) || 'Same name already added']"
+        :rules="[(val: string) => nameNotTaken(cappedName(val)) || 'Same name already added']"
+        @keyup.enter="addNewAttendant()"
       >
         <template #append>
           <q-btn dense flat icon="add" @click="addNewAttendant()"></q-btn>

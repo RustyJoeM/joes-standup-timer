@@ -23,13 +23,13 @@
           icon="restore"
           label="Reset"
           :disable="spokenAttendants.length < 1"
-          @click="resetTimes()"
           class="q-ml-md"
+          @click="resetTimes()"
         >
           <q-tooltip :delay="500">Reset elapsed times of all attendants</q-tooltip>
         </q-btn>
 
-        <q-btn dense icon="close" label="Delete" @click="resetMeetingDialog" class="q-ml-md">
+        <q-btn dense icon="close" label="Delete" class="q-ml-md" @click="resetMeetingDialog">
           <q-tooltip :delay="500">Delete all participants</q-tooltip>
         </q-btn>
       </div>
@@ -45,7 +45,7 @@
               :key="attendant._uid"
               :attendant="attendant"
               :is-active="attendant._uid == activeAttendantId"
-              :allowCheckout="false"
+              :allow-checkout="false"
               class="q-mt-sm"
             ></attendant-view>
           </transition-group>
@@ -93,7 +93,7 @@
                 <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
               </q-linear-progress>
               <transition appear enter-active-class="animated heartBeat">
-                <q-badge floating v-if="att._uid == nextAttendantId">NEXT</q-badge>
+                <q-badge v-if="att._uid == nextAttendantId" floating>NEXT</q-badge>
               </transition>
             </q-card>
           </div>

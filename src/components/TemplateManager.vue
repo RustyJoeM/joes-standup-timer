@@ -1,7 +1,7 @@
 <template>
   <q-btn dense icon="meeting_room" label="Meeting templates">
     <q-menu dense>
-      <q-item clickable @click="currentToTemplate" class="row items-center">
+      <q-item clickable class="row items-center" @click="currentToTemplate">
         <q-item-section> Save new template </q-item-section>
         <q-item-section side>
           <q-icon name="question_mark" size="xs">
@@ -9,19 +9,19 @@
           </q-icon>
         </q-item-section>
       </q-item>
-      <q-item clickable v-if="meetingTemplates.length > 0">
+      <q-item v-if="meetingTemplates.length > 0" clickable>
         <q-item-section>Setup from template</q-item-section>
         <q-item-section side>
           <q-icon name="keyboard_arrow_right" />
         </q-item-section>
 
         <q-menu dense anchor="top end" self="top start">
-          <q-item v-for="(t, index) in meetingTemplates" :key="index" clickable v-close-popup @click="setupTemplate(t)">
+          <q-item v-for="(t, index) in meetingTemplates" :key="index" v-close-popup clickable @click="setupTemplate(t)">
             <template-view
               :template="t"
+              class="col"
               @edit-label="editLabel(t, $event)"
               @remove-template="removeTemplate(index)"
-              class="col"
             ></template-view>
           </q-item>
         </q-menu>

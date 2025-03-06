@@ -1,15 +1,15 @@
 <template>
   <q-chip square :color="CHIP_COLOR">
     <span :class="`text-subtitle1 text-${TEXT_COLOR}`">{{ attendant.name }}</span>
-    <q-popup-edit v-model="attendantName" auto-save v-slot="scope" :validate="validateRename">
+    <q-popup-edit v-slot="scope" v-model="attendantName" auto-save :validate="validateRename">
       <q-input
-        filled
         v-model="scope.value"
+        filled
         dense
         autofocus
         hide-bottom-space
+        :rules="[(val: string) => nameNotTaken(val, attendant._uid) || 'Same name already exists']"
         @keyup.enter="scope.set"
-        :rules="[(val) => nameNotTaken(val, attendant._uid) || 'Same name already exists']"
       />
     </q-popup-edit>
     <slot />

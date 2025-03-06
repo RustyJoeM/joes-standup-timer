@@ -5,7 +5,7 @@
       <q-badge outline color="grey" @click.stop>
         <q-icon name="edit" size="xs">
           <q-tooltip :delay="500">Edit label</q-tooltip>
-          <q-popup-edit v-model="templateLabel" auto-save v-slot="scope">
+          <q-popup-edit v-slot="scope" v-model="templateLabel" auto-save>
             <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
           </q-popup-edit>
         </q-icon>

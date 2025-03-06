@@ -2,12 +2,8 @@
   <span class="row items-center text-subtitle1">
     <b>{{ edgeNames?.join(' & ') }}</b> &nbsp; get{{ edgeNames && edgeNames.length > 1 ? '' : 's' }}
     the &nbsp;
-    <transition
-      :appear="props.delayAnimMs == undefined"
-      mode="out-in"
-      enter-active-class="animated tada slower"
-    >
-      <q-chip clickable color="amber" :key="counter" @click="counter++" class="text-black">
+    <transition :appear="props.delayAnimMs == undefined" mode="out-in" enter-active-class="animated tada slower">
+      <q-chip :key="counter" clickable color="amber" class="text-black" @click="counter++">
         <slot name="rivet"></slot> &nbsp; {{ randomizedTitle }} &nbsp; <slot name="rivet"></slot>
       </q-chip>
     </transition>
@@ -53,8 +49,7 @@ const edgeNames = computed(() => {
 });
 
 onMounted(() => {
-  randomizedTitle.value =
-    props.titlePool[(Math.random() * props.titlePool.length) | 0].toUpperCase();
+  randomizedTitle.value = props.titlePool[(Math.random() * props.titlePool.length) | 0].toUpperCase();
 
   if (props.delayAnimMs) {
     setTimeout(() => {

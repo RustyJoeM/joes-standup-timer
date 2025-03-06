@@ -4,28 +4,28 @@
       <section class="row items-center">
         <div>
           <transition appear enter-active-class="animated pulse" mode="out-in">
-            <span v-if="activeAttendant" class="text-subtitle1" :key="'' + tickerId">
+            <span v-if="activeAttendant" :key="'' + tickerId" class="text-subtitle1">
               {{ activeAttendant.name }} is {{ tickerId ? 'talking' : 'having a pause' }}.
             </span>
             <span v-else class="text-subtitle1">No one talking now.</span>
           </transition>
         </div>
 
-        <section class="q-ml-md" v-if="activeAttendant">
+        <section v-if="activeAttendant" class="q-ml-md">
           <transition appear enter-active-class="animated pulse slower" mode="out-in">
-            <control-button id="pause-button" v-if="tickerId" icon="pause" @click="doPause()">
+            <control-button v-if="tickerId" id="pause-button" icon="pause" @click="doPause()">
               <q-tooltip :delay="2000">{{ pauseLabel }}</q-tooltip>
             </control-button>
-            <control-button id="resume-button" v-else icon="replay" @click="doResume()">
+            <control-button v-else id="resume-button" icon="replay" @click="doResume()">
               <q-tooltip :delay="2000">{{ playLabel }}</q-tooltip>
             </control-button>
           </transition>
         </section>
 
-        <section class="col q-ml-md" v-if="waitingAttendants.length > 0 || activeAttendantId">
+        <section v-if="waitingAttendants.length > 0 || activeAttendantId" class="col q-ml-md">
           <control-button
-            id="finish-button"
             v-if="activeAttendant"
+            id="finish-button"
             color="secondary"
             icon="check"
             :label="finishLabel"
@@ -33,8 +33,8 @@
           >
           </control-button>
           <control-button
-            id="start-next-button"
             v-else
+            id="start-next-button"
             color="primary"
             icon="skip_next"
             :label="nextLabel"
