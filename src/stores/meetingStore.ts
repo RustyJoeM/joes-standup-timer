@@ -7,6 +7,14 @@ const TICK_INTERVAL_MS = 100;
 
 const ATTENDANT_GROUPS = ['waitingAttendants', 'spokenAttendants', 'absentAttendants'] as const;
 
+export enum AttendeeEvent {
+  Reset,
+  Remove,
+  CheckIn,
+  CheckOut,
+  Talking,
+}
+
 export const useMeetingStore = defineStore('meeting', {
   state: () => ({
     tickSize: TICK_INTERVAL_MS,
@@ -23,6 +31,8 @@ export const useMeetingStore = defineStore('meeting', {
     tickerId: undefined as NodeJS.Timeout | undefined,
 
     meetingTemplates: [] as MeetingTemplate[],
+
+    lastEvent: AttendeeEvent.Reset,
   }),
 
   getters: {
@@ -58,6 +68,7 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     resetMeeting() {
+      this.lastEvent = AttendeeEvent.Reset;
       if (this.tickerId != undefined) {
         clearInterval(this.tickerId);
         this.tickerId = undefined;
@@ -68,6 +79,7 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     resetTimes() {
+      this.lastEvent = AttendeeEvent.Reset;
       if (this.tickerId != undefined) {
         clearInterval(this.tickerId);
         this.tickerId = undefined;
@@ -95,6 +107,7 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     removeAttendant(uid: string) {
+      this.lastEvent = AttendeeEvent.Remove;
       if (uid == this.activeAttendantId) {
         notifyMessage('warning', "Won't delete current talker...");
         return;
@@ -110,6 +123,7 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     toggleAttendantAbsence(uid: string, perform: 'check-in' | 'check-out') {
+      this.lastEvent = perform == 'check-in' ? AttendeeEvent.CheckIn : AttendeeEvent.CheckOut;
       const from = perform == 'check-in' ? this.absentAttendants : this.waitingAttendants;
       const to = perform == 'check-in' ? this.waitingAttendants : this.absentAttendants;
       const index = from.findIndex((att) => att._uid == uid);

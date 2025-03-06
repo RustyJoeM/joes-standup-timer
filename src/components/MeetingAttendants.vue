@@ -39,7 +39,7 @@
       <span class="q-mt-md text-subtitle1">Have talked:</span>
       <section class="row justify-center">
         <section class="col-9">
-          <transition-group appear enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
+          <transition-group appear enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutRight">
             <attendant-view
               v-for="attendant in spokenAttendants"
               :key="attendant._uid"
@@ -58,31 +58,27 @@
 
       <template v-if="!runningMysteryMode">
         <section class="row justify-center">
-          <draggable :list="waitingAttendants" item-key="_uid" class="col-9" @update="reorderedWaiting">
-            <template #item="{ element }: { element: Attendant, index: number }">
-              <transition appear enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
+          <VueDraggable v-model="waitingAttendants" class="col-9" @update="reorderedWaiting">
+            <transition-group :enter-active-class="midEnterAnimation" :leave-active-class="midLeaveAnimation">
+              <div v-for="item in waitingAttendants" :key="item._uid">
                 <attendant-view
-                  :attendant="element"
-                  :is-active="element._uid == activeAttendantId"
+                  :attendant="item"
+                  :is-active="item._uid == activeAttendantId"
                   :allow-checkout="true"
                   class="q-mt-sm"
                 ></attendant-view>
-              </transition>
-            </template>
-          </draggable>
+              </div>
+            </transition-group>
+          </VueDraggable>
         </section>
-        <transition mode="out-in" enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
+        <transition mode="out-in" enter-active-class="animated zoomIn" leave-active-class="animated zoomOut">
           <section v-if="!runningMysteryMode && waitingAttendants.length > 1" class="q-mt-sm row justify-center">
             <span>(drag around to reorder)</span>
           </section>
         </transition>
       </template>
       <div v-else class="row justify-center">
-        <transition-group
-          appear
-          enter-active-class="animated bounceIn slow"
-          leave-active-class="animated bounceOut slow"
-        >
+        <transition-group appear :enter-active-class="midEnterAnimation" :leave-active-class="midLeaveAnimation">
           <div v-for="att of waitingAttendants" :key="att._uid" class="q-ml-md">
             <q-card class="q-mt-sm">
               <!-- extra q-card for floating badge anchoring! -->
@@ -96,7 +92,7 @@
                 ></absence-toggle-button>
                 <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
               </q-linear-progress>
-              <transition appear enter-active-class="animated heartBeat slow">
+              <transition appear enter-active-class="animated heartBeat">
                 <q-badge floating v-if="att._uid == nextAttendantId">NEXT</q-badge>
               </transition>
             </q-card>
@@ -109,11 +105,7 @@
       <span class="text-subtitle1">Postponed / absent talkers:</span>
 
       <div class="row">
-        <transition-group
-          appear
-          enter-active-class="animated bounceIn slow"
-          leave-active-class="animated bounceOut slow"
-        >
+        <transition-group appear enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp">
           <div v-for="att of absentAttendants" :key="att._uid" class="q-ml-md">
             <q-linear-progress size="3rem" rounded class="row items-center q-mt-md">
               <attendant-chip :attendant="att" class="q-ml-sm"></attendant-chip>
@@ -135,13 +127,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import draggable from 'vuedraggable';
 import { useQuasar } from 'quasar';
+import { VueDraggable } from 'vue-draggable-plus';
 
 import AttendantView from './AttendantView.vue';
 import AttendantChip from './AttendantChip.vue';
-import { useMeetingStore } from 'src/stores/meetingStore';
-import { Attendant, msToFormatted } from './AttendantModel';
+import { AttendeeEvent, useMeetingStore } from 'src/stores/meetingStore';
+import { msToFormatted } from './AttendantModel';
 
 import AbsenceToggleButton from './AbsenceToggleButton.vue';
 import AttendantRemoveButton from './AttendantRemoveButton.vue';
@@ -156,6 +148,7 @@ const {
   activeAttendantId,
   runningMysteryMode,
   nextAttendantId,
+  lastEvent,
 } = storeToRefs(useMeetingStore());
 
 const presentAttendants = computed(() => {
@@ -192,4 +185,22 @@ const resetMeetingDialog = () => {
     resetMeeting();
   });
 };
+
+const midLeaveAnimation = computed(() => {
+  const animation = {
+    // [AttendeeEvent.Talking]: 'fadeOutUp',
+    // [AttendeeEvent.CheckOut]: 'fadeOutDown',
+    [AttendeeEvent.Remove]: 'fadeOutRight',
+    [AttendeeEvent.Reset]: 'fadeOut',
+  }[lastEvent.value];
+  return animation ? `animated ${animation}` : undefined;
+});
+
+const midEnterAnimation = computed(() => {
+  const animation = {
+    [AttendeeEvent.CheckIn]: 'fadeInUp',
+    [AttendeeEvent.Reset]: 'fadeIn',
+  }[lastEvent.value];
+  return animation ? `animated ${animation}` : undefined;
+});
 </script>

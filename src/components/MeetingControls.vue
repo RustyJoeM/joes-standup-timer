@@ -50,14 +50,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useMeetingStore } from 'src/stores/meetingStore';
+import { AttendeeEvent, useMeetingStore } from 'src/stores/meetingStore';
 import { notifyMessage } from './NotifyHelper';
 import ControlButton from './ControlButton.vue';
 
 const { updateNextAttendant } = useMeetingStore();
 
-const { spokenAttendants, waitingAttendants, activeAttendant, activeAttendantId, nextAttendant, tickSize, tickerId } =
-  storeToRefs(useMeetingStore());
+const {
+  spokenAttendants,
+  waitingAttendants,
+  activeAttendant,
+  activeAttendantId,
+  nextAttendant,
+  tickSize,
+  tickerId,
+  lastEvent,
+} = storeToRefs(useMeetingStore());
 
 const lastTickMs = ref<number | undefined>(undefined);
 
@@ -97,6 +105,7 @@ const doPause = () => {
   notifyMessage('info', `${activeAttendant.value?.name} catches a breath...`);
 };
 
+// TODO this should be handled by store completely?
 const finishActive = () => {
   // stop running ticker if applicable
   if (tickerId.value) {
@@ -113,6 +122,7 @@ const finishActive = () => {
 };
 
 const doNext = () => {
+  lastEvent.value = AttendeeEvent.Talking;
   // start next person if applicable
   if (nextAttendant.value) {
     notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
