@@ -39,17 +39,14 @@
       <span class="q-mt-md text-subtitle1">Have talked:</span>
       <section class="row justify-center">
         <section class="col-9">
-          <transition-group
-            v-for="attendant in spokenAttendants"
-            :key="attendant._uid"
-            leave-active-class="animated zoomOut slow"
-          >
+          <transition-group appear enter-active-class="animated zoomIn slow" leave-active-class="animated zoomOut slow">
             <attendant-view
+              v-for="attendant in spokenAttendants"
               :key="attendant._uid"
               :attendant="attendant"
               :is-active="attendant._uid == activeAttendantId"
               :allowCheckout="false"
-              class="q-mt-md"
+              class="q-mt-sm"
             ></attendant-view>
           </transition-group>
         </section>
@@ -112,18 +109,24 @@
       <span class="text-subtitle1">Postponed / absent talkers:</span>
 
       <div class="row">
-        <div v-for="att of absentAttendants" :key="att._uid" class="q-ml-md">
-          <q-linear-progress size="3rem" rounded class="row items-center q-mt-md">
-            <attendant-chip :attendant="att" class="q-ml-sm"></attendant-chip>
-            <absence-toggle-button
-              :perform="'check-in'"
-              :uid="att._uid"
-              size="sm"
-              class="q-ml-lg"
-            ></absence-toggle-button>
-            <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
-          </q-linear-progress>
-        </div>
+        <transition-group
+          appear
+          enter-active-class="animated bounceIn slow"
+          leave-active-class="animated bounceOut slow"
+        >
+          <div v-for="att of absentAttendants" :key="att._uid" class="q-ml-md">
+            <q-linear-progress size="3rem" rounded class="row items-center q-mt-md">
+              <attendant-chip :attendant="att" class="q-ml-sm"></attendant-chip>
+              <absence-toggle-button
+                :perform="'check-in'"
+                :uid="att._uid"
+                size="sm"
+                class="q-ml-lg"
+              ></absence-toggle-button>
+              <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
+            </q-linear-progress>
+          </div>
+        </transition-group>
       </div>
     </section>
   </section>
