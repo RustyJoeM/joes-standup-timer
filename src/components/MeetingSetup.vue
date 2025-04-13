@@ -1,6 +1,6 @@
 <template>
   <div class="column">
-    <header class="row items-center justify-between">
+    <header class="row items-baseline justify-between">
       <span class="text-h6">Meeting setup</span>
       <q-btn flat icon="share" label="share" dense @click="setupToClipboard">
         <q-tooltip :delay="500">Copy current setup to URL link</q-tooltip>
