@@ -22,7 +22,7 @@ export const useMeetingStore = defineStore('meeting', {
     displayMillis: false,
     runningMysteryMode: false,
 
-    spokenAttendants: [] as Attendant[], // people that have spoken (or are speakign currently)
+    spokenAttendants: [] as Attendant[], // people that have spoken (or are speaking currently)
     waitingAttendants: [] as Attendant[], // people in the meeting waiting for their turn
     absentAttendants: [] as Attendant[], // people expected in meeting but not present / to be picked as "next" to talk
 
@@ -154,7 +154,7 @@ export const useMeetingStore = defineStore('meeting', {
     nameNotTaken(val: string, exceptUid?: string) {
       if (exceptUid == undefined) return !this.allAttendantNames.some((name) => name == val);
       for (const group of ATTENDANT_GROUPS) {
-        if (this[group].filter((att) => att._uid != exceptUid).some((att) => att.name == val)) return false;
+        if (this[group].filter((att: Attendant) => att._uid != exceptUid).some((att) => att.name == val)) return false;
       }
       return true;
     },

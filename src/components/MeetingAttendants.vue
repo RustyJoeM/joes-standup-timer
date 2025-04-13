@@ -12,8 +12,15 @@
       </section>
 
       <div v-if="presentAttendants > 0" class="row items-center">
-        <transition appear enter-active-class="animated shakeY slower">
-          <q-btn v-if="waitingAttendants.length > 1" dense icon="shuffle" label="shuffle" @click="doShuffle()">
+        <transition appear enter-active-class="animated shakeY slow">
+          <q-btn
+            v-if="waitingAttendants.length > 1"
+            dense
+            icon="shuffle"
+            label="shuffle"
+            :disable="shuffleDisabled"
+            @click="doShuffle()"
+          >
             <q-tooltip :delay="500">Shuffle waiting speakers</q-tooltip>
           </q-btn>
         </transition>
@@ -59,7 +66,11 @@
       <template v-if="!runningMysteryMode">
         <section class="row justify-center">
           <VueDraggable v-model="waitingAttendants" class="col-9" @update="reorderedWaiting">
-            <transition-group :enter-active-class="midEnterAnimation" :leave-active-class="midLeaveAnimation">
+            <transition-group
+              name="shuffle"
+              :enter-active-class="midEnterAnimation"
+              :leave-active-class="midLeaveAnimation"
+            >
               <div v-for="item in waitingAttendants" :key="item._uid">
                 <attendant-view
                   :attendant="item"
@@ -125,9 +136,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
+import { useThrottleFn } from '@vueuse/core';
 import { VueDraggable } from 'vue-draggable-plus';
 
 import AttendantView from './AttendantView.vue';
@@ -137,6 +149,7 @@ import { msToFormatted } from './AttendantModel';
 
 import AbsenceToggleButton from './AbsenceToggleButton.vue';
 import AttendantRemoveButton from './AttendantRemoveButton.vue';
+
 
 const { shuffleAttendants, resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
 
@@ -160,14 +173,24 @@ const estimatedTotalTime = computed(() => {
   return msToFormatted(msTotal, false);
 });
 
-const doShuffle = async () => {
+const SHUFFLE_LENGTH = 1;
+
+const shuffleDisabled = ref(false);
+
+const shuffleLength = computed(() => {
+  return `${SHUFFLE_LENGTH}s`;
+});
+
+const doShuffle = useThrottleFn(async () => {
+  shuffleDisabled.value = true;
+  setTimeout(() => (shuffleDisabled.value = false), 1000 * SHUFFLE_LENGTH);
   if (!runningMysteryMode.value) {
     shuffleAttendants();
   }
   updateNextAttendant();
-};
+}, 1000 * SHUFFLE_LENGTH);
 
-const reorderedWaiting = ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => {
+const reorderedWaiting = ({ oldIndex, newIndex }: { oldIndex: number | undefined; newIndex: number | undefined }) => {
   // update next / top-most waiting speaker if needed
   if (oldIndex == 0 || newIndex == 0) {
     updateNextAttendant();
@@ -187,20 +210,28 @@ const resetMeetingDialog = () => {
 };
 
 const midLeaveAnimation = computed(() => {
-  const animation = {
+  const ANIMS: Partial<Record<AttendeeEvent, string>> = {
     // [AttendeeEvent.Talking]: 'fadeOutUp',
     // [AttendeeEvent.CheckOut]: 'fadeOutDown',
     [AttendeeEvent.Remove]: 'fadeOutRight',
     [AttendeeEvent.Reset]: 'fadeOut',
-  }[lastEvent.value];
+  };
+  const animation = ANIMS[lastEvent.value];
   return animation ? `animated ${animation}` : undefined;
 });
 
 const midEnterAnimation = computed(() => {
-  const animation = {
+  const ANIMS: Partial<Record<AttendeeEvent, string>> = {
     [AttendeeEvent.CheckIn]: 'fadeInUp',
     [AttendeeEvent.Reset]: 'fadeIn',
-  }[lastEvent.value];
+  };
+  const animation = ANIMS[lastEvent.value];
   return animation ? `animated ${animation}` : undefined;
 });
 </script>
+
+<style scoped>
+.shuffle-move {
+  transition: transform v-bind(shuffleLength);
+}
+</style>
