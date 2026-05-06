@@ -13,10 +13,10 @@
 
         <section v-if="activeAttendant" class="q-ml-md">
           <transition appear enter-active-class="animated pulse slower" mode="out-in">
-            <control-button v-if="tickerId" id="pause-button" icon="pause" @click="doPause()">
+            <control-button v-if="tickerId" id="pause-button" icon="pause" @click.stop="doPause()">
               <q-tooltip :delay="2000">{{ pauseLabel }}</q-tooltip>
             </control-button>
-            <control-button v-else id="resume-button" icon="replay" @click="doResume()">
+            <control-button v-else id="resume-button" icon="replay" @click.stop="doResume()">
               <q-tooltip :delay="2000">{{ playLabel }}</q-tooltip>
             </control-button>
           </transition>
@@ -29,7 +29,7 @@
             color="secondary"
             icon="check"
             :label="finishLabel"
-            @click="finishActive()"
+            @click.stop="finishActive()"
           >
           </control-button>
           <control-button
@@ -38,7 +38,7 @@
             color="primary"
             icon="skip_next"
             :label="nextLabel"
-            @click="doNext()"
+            @click.stop="doNext()"
           >
           </control-button>
         </section>
@@ -125,7 +125,7 @@ const doNext = () => {
   lastEvent.value = AttendeeEvent.Talking;
   // start next person if applicable
   if (nextAttendant.value) {
-    notifyMessage('info', `${nextAttendant.value?.name} talks NOW!`);
+    notifyMessage('info', `It's ${nextAttendant.value?.name}'s turn...`);
     activeAttendantId.value = nextAttendant.value._uid;
 
     const nextAttWaitIndex = waitingAttendants.value.findIndex((att) => att._uid == nextAttendant.value?._uid);
