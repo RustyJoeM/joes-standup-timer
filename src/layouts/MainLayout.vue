@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import TemplateManager from 'components/TemplateManager.vue';
 import MysteryModeToggle from 'components/MysteryModeToggle.vue';
-import DarkModeToggle from 'components/DarkModeToggle.vue';
+import DarkModeToggle from 'components/controls/DarkModeToggle.vue';
 
 const GUTTER_CLASS = 'q-ml-md';
 </script>

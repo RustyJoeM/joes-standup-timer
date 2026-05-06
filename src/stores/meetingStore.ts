@@ -133,6 +133,26 @@ export const useMeetingStore = defineStore('meeting', {
       this.updateNextAttendant();
     },
 
+    requeueFinishedAttendant(uid: string) {
+      const index = this.spokenAttendants.findIndex((att) => att._uid == uid);
+      if (index == -1) {
+        return;
+      }
+
+      const movedAttendant = this.spokenAttendants.splice(index, 1)[0];
+      movedAttendant.hasFinished = false;
+      this.waitingAttendants.unshift(movedAttendant);
+      this.updateNextAttendant();
+    },
+
+    resetPendingTime(uid: string) {
+      let attendant = undefined;
+      attendant = this.waitingAttendants.find((att) => att._uid == uid);
+      if (attendant == undefined) attendant = this.spokenAttendants.find((att) => att._uid == uid);
+      if (attendant == undefined) return;
+      attendant.msElapsed = 0;
+    },
+
     updateNextAttendant() {
       if (this.tickerId) return; // do no change when time is running
       if (!this.tickerId && this.activeAttendantId) return; // paused talker
