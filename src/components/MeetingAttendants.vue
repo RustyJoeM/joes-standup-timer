@@ -4,11 +4,11 @@
       <section class="text-h6">
         <template v-if="presentAttendants > 0">
           <span>
-            {{ presentAttendants }} {{ presentAttendants > 1 ? 'people' : ' person' }} attending -
-            {{ estimatedTotalTime }} in total
+            {{ presentAttendants }} {{ presentAttendants > 1 ? 'people' : ' person' }} attending (est.
+            {{ estimatedTotalTime }})
           </span>
         </template>
-        <span v-else>No present or setup attendants yet.</span>
+        <span v-else>No attendants set up yet.</span>
       </section>
 
       <div v-if="presentAttendants > 0" class="row items-center">
@@ -149,7 +149,6 @@ import { msToFormatted } from './AttendantModel';
 
 import AbsenceToggleButton from './AbsenceToggleButton.vue';
 import AttendantRemoveButton from './AttendantRemoveButton.vue';
-
 
 const { shuffleAttendants, resetTimes, resetMeeting, updateNextAttendant } = useMeetingStore();
 

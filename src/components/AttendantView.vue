@@ -2,10 +2,13 @@
   <q-linear-progress
     :value="progress"
     size="3rem"
-    color="primary"
+    :color="progressColor"
     :animation-speed="animSpeed"
     :stripe="isActive"
     rounded
+    class="done"
+    @mouseover="showTimeReset = true"
+    @mouseleave="showTimeReset = false"
   >
     <div class="absolute-full flex flex-center row">
       <div class="col-12 row items-center">
@@ -14,7 +17,7 @@
         </section>
         <section class="col row justify-center">
           <q-chip
-            v-if="attendant.hasFinished || isActive"
+            v-if="attendant.msElapsed > 0 || isActive"
             :color="CHIP_COLOR"
             square
             size="md"
@@ -22,14 +25,30 @@
             :label="formattedTimestamp"
           />
         </section>
-        <section class="col row justify-end">
+        <section class="col row justify-end q-mx-md">
+          <styled-button
+            v-if="showTimeReset && props.attendant.msElapsed > 0 && !props.attendant.hasFinished"
+            size="sm"
+            icon="alarm_off"
+            tooltip="clear time talked"
+            @click="resetPendingTime(props.attendant._uid)"
+          />
+          <styled-button
+            v-if="showTimeReset && attendant.hasFinished"
+            size="sm"
+            class="q-ml-md"
+            icon="alarm_add"
+            tooltip="re-queue to talk again"
+            @click="requeueFinishedAttendant(props.attendant._uid)"
+          />
           <absence-toggle-button
             v-if="props.allowCheckout"
             :perform="'check-out'"
             :uid="attendant._uid"
             size="sm"
+            class="q-ml-md"
           ></absence-toggle-button>
-          <attendant-remove-button :uid="attendant._uid" class="q-ml-md q-mr-md" size="sm"></attendant-remove-button>
+          <attendant-remove-button :uid="attendant._uid" class="q-ml-md" size="sm"></attendant-remove-button>
         </section>
       </div>
     </div>
@@ -37,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useMeetingStore } from 'src/stores/meetingStore';
 import { Attendant, msToFormatted } from './AttendantModel';
@@ -46,6 +65,7 @@ import { useAttendantStyling } from './AttendantStyling';
 
 import AbsenceToggleButton from './AbsenceToggleButton.vue';
 import AttendantRemoveButton from './AttendantRemoveButton.vue';
+import StyledButton from './StyledButton.vue';
 
 const props = defineProps<{
   attendant: Attendant;
@@ -54,6 +74,8 @@ const props = defineProps<{
 }>();
 
 const { msPerAttendant, tickSize, displayMillis } = storeToRefs(useMeetingStore());
+
+const { resetPendingTime, requeueFinishedAttendant } = useMeetingStore();
 
 const animSpeed = computed(() => 0.95 * tickSize.value);
 
@@ -83,4 +105,16 @@ const formattedTimestamp = computed(() => {
 });
 
 const { CHIP_COLOR, TEXT_COLOR } = useAttendantStyling();
+
+const progressColor = computed(() => (props.isActive ? 'primary' : undefined));
+
+const showTimeReset = ref(false);
+
+const barGrayscaleLevel = computed(() => (props.isActive ? 0 : 100));
 </script>
+
+<style scoped>
+.done {
+  filter: grayscale(v-bind(barGrayscaleLevel));
+}
+</style>
