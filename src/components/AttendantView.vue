@@ -13,7 +13,7 @@
     <div class="absolute-full flex flex-center row">
       <div class="col-12 row items-center">
         <section class="q-ml-sm col row justify-start">
-          <attendant-chip :attendant="attendant"></attendant-chip>
+          <attendant-chip :attendant="attendant" />
         </section>
         <section class="col row justify-center">
           <q-chip
@@ -47,8 +47,8 @@
             :uid="attendant._uid"
             size="sm"
             class="q-ml-md"
-          ></absence-toggle-button>
-          <attendant-remove-button :uid="attendant._uid" class="q-ml-md" size="sm"></attendant-remove-button>
+          />
+          <attendant-remove-button :uid="attendant._uid" class="q-ml-md" size="sm" />
         </section>
       </div>
     </div>

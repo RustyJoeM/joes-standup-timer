@@ -1,21 +1,21 @@
 <template>
   <div class="q-mb-xl column">
     <q-card class="q-pa-lg">
-      <meeting-setup :meeting-started="meetingHasStarted"></meeting-setup>
+      <meeting-setup :meeting-started="meetingHasStarted" />
     </q-card>
 
     <q-card class="q-mt-lg q-pa-lg">
-      <meeting-attendants></meeting-attendants>
+      <meeting-attendants />
     </q-card>
 
     <q-page-sticky :offset="controlsPosition">
-      <meeting-controls v-touch-pan.prevent.mouse="moveControls"></meeting-controls>
+      <meeting-controls v-touch-pan.prevent.mouse="moveControls" />
     </q-page-sticky>
 
     <transition appear enter-active-class="animated backInDown slow" leave-active-class="animated backOutUp slow">
       <q-card v-if="meetingHasFinished" class="q-mt-lg q-pa-lg">
         <q-card-section>
-          <meeting-results></meeting-results>
+          <meeting-results />
         </q-card-section>
       </q-card>
     </transition>

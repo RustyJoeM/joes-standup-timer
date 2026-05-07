@@ -3,7 +3,7 @@
     <q-menu dense class="column q-pa-sm">
       <q-item class="text-no-wrap">Vue v{{ version }} / Quasar v{{ $q.version }}</q-item>
       <q-item>Git# "{{ GIT_HASH }}" </q-item>
-      <q-item> <display-millis-toggle></display-millis-toggle> </q-item>
+      <q-item> <display-millis-toggle /> </q-item>
     </q-menu>
   </q-btn>
 </template>

@@ -21,7 +21,7 @@
             :disable="shuffleDisabled"
             @click="doShuffle()"
           >
-            <q-tooltip :delay="500">Shuffle waiting speakers</q-tooltip>
+            <q-tooltip :delay="500">Shuffle the waiting speakers</q-tooltip>
           </q-btn>
         </transition>
 
@@ -54,7 +54,7 @@
               :is-active="attendant._uid == activeAttendantId"
               :allow-checkout="false"
               class="q-mt-sm"
-            ></attendant-view>
+            />
           </transition-group>
         </section>
       </section>
@@ -77,7 +77,7 @@
                   :is-active="item._uid == activeAttendantId"
                   :allow-checkout="true"
                   class="q-mt-sm"
-                ></attendant-view>
+                />
               </div>
             </transition-group>
           </VueDraggable>
@@ -94,14 +94,9 @@
             <q-card class="q-mt-sm">
               <!-- extra q-card for floating badge anchoring! -->
               <q-linear-progress size="3rem" rounded class="row items-center">
-                <attendant-chip :attendant="att" class="q-ml-md"></attendant-chip>
-                <absence-toggle-button
-                  :perform="'check-out'"
-                  :uid="att._uid"
-                  size="sm"
-                  class="q-ml-lg"
-                ></absence-toggle-button>
-                <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
+                <attendant-chip :attendant="att" class="q-ml-md" />
+                <absence-toggle-button :perform="'check-out'" :uid="att._uid" size="sm" class="q-ml-lg" />
+                <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md" />
               </q-linear-progress>
               <transition appear enter-active-class="animated heartBeat">
                 <q-badge v-if="att._uid == nextAttendantId" floating>NEXT</q-badge>
@@ -119,14 +114,9 @@
         <transition-group appear enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp">
           <div v-for="att of absentAttendants" :key="att._uid" class="q-ml-md">
             <q-linear-progress size="3rem" rounded class="row items-center q-mt-md">
-              <attendant-chip :attendant="att" class="q-ml-sm"></attendant-chip>
-              <absence-toggle-button
-                :perform="'check-in'"
-                :uid="att._uid"
-                size="sm"
-                class="q-ml-lg"
-              ></absence-toggle-button>
-              <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md"></attendant-remove-button>
+              <attendant-chip :attendant="att" class="q-ml-sm" />
+              <absence-toggle-button :perform="'check-in'" :uid="att._uid" size="sm" class="q-ml-lg" />
+              <attendant-remove-button :uid="att._uid" size="sm" class="q-ml-md q-mr-md" />
             </q-linear-progress>
           </div>
         </transition-group>

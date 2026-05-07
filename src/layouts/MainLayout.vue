@@ -9,13 +9,12 @@
         </section>
 
         <section class="col row justify-evenly">
-          <template-manager></template-manager>
-          <mystery-mode-toggle></mystery-mode-toggle>
+          <template-manager />
+          <mystery-mode-toggle />
         </section>
 
         <section class="col row justify-end">
-          <dark-mode-toggle size="md" :class="GUTTER_CLASS"></dark-mode-toggle>
-          <!-- <dev-tools :class="GUTTER_CLASS"></dev-tools> -->
+          <dark-mode-toggle size="md" class="q-ml-md" />
         </section>
       </q-toolbar>
     </q-header>
@@ -30,6 +29,4 @@
 import TemplateManager from 'components/TemplateManager.vue';
 import MysteryModeToggle from 'components/MysteryModeToggle.vue';
 import DarkModeToggle from 'components/controls/DarkModeToggle.vue';
-
-const GUTTER_CLASS = 'q-ml-md';
 </script>
