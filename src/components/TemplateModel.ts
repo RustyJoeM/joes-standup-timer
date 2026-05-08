@@ -1,5 +1,10 @@
+export interface MeetingNames {
+  waiting: string[];
+  absent: string[];
+}
+
 export interface MeetingTemplate {
   label: string;
-  names: string[];
+  names: MeetingNames;
   msPerAttendant: number;
 }

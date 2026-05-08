@@ -48,7 +48,7 @@ import { MIN_TALK_TIME_MS } from './AttendantModel';
 
 const newNameRef = ref<QInput | null>(null);
 
-const { allAttendantNames, msPerAttendant } = storeToRefs(useMeetingStore());
+const { msPerAttendant } = storeToRefs(useMeetingStore());
 const { addAttendant, updateNextAttendant, resetMeeting, nameNotTaken } = useMeetingStore();
 
 const cappedName = (name: string) => {
@@ -88,24 +88,19 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
-const NAME_SEPARATOR = ',';
+const { setupFromString, setupToString } = useMeetingStore();
 
 interface SetupQueryProps {
-  secs: number | undefined;
-  names: string | undefined;
+  setup: string | undefined;
 }
 
 watch(
   () => route.query,
   (newQuery) => {
     resetMeeting();
-    const queryProps = newQuery as unknown as SetupQueryProps;
-    if (queryProps.secs) {
-      msPerAttendant.value = queryProps.secs * 1000;
-    }
-    if (queryProps.names) {
-      const namesStr = decodeURIComponent(queryProps.names);
-      namesStr.split(NAME_SEPARATOR).forEach((name) => addAttendant(name));
+    const props = newQuery as unknown as SetupQueryProps;
+    if (props.setup) {
+      setupFromString(props.setup);
       updateNextAttendant();
     }
   },
@@ -115,10 +110,7 @@ watch(
 const setupToClipboard = () => {
   const loc = window.location;
   const path = `${loc.protocol}//${loc.host}${loc.pathname}`;
-  const secs = '' + msPerAttendant.value / 1000;
-  // TODO preserve present/absent groups?
-  const namesStr = allAttendantNames.value.join(NAME_SEPARATOR);
-  const url = `${path}#/?secs=${secs}&names=${encodeURIComponent(namesStr)}`;
+  const url = `${path}#/?setup=${encodeURIComponent(setupToString())}`;
   copyToClipboard(url);
   Notify.create({ position: 'bottom', type: 'info', message: 'URL copied to clipboard...' });
 };

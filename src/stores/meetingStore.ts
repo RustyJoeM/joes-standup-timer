@@ -30,8 +30,6 @@ export const useMeetingStore = defineStore('meeting', {
     nextAttendantId: undefined as AttendantId | undefined,
     tickerId: undefined as NodeJS.Timeout | undefined,
 
-    meetingTemplates: [] as MeetingTemplate[],
-
     lastEvent: AttendeeEvent.Reset,
   }),
 
@@ -44,12 +42,6 @@ export const useMeetingStore = defineStore('meeting', {
     nextAttendant: (state): Attendant | undefined => {
       if (!state.nextAttendantId) return undefined;
       return state.waitingAttendants.find((att) => att._uid == state.nextAttendantId);
-    },
-
-    allAttendantNames: (state): string[] => {
-      let res: string[] = [];
-      for (const group of ATTENDANT_GROUPS) res = res.concat(state[group].map((att) => att.name));
-      return res;
     },
   },
 
@@ -172,11 +164,49 @@ export const useMeetingStore = defineStore('meeting', {
     },
 
     nameNotTaken(val: string, exceptUid?: string) {
-      if (exceptUid == undefined) return !this.allAttendantNames.some((name) => name == val);
       for (const group of ATTENDANT_GROUPS) {
         if (this[group].filter((att: Attendant) => att._uid != exceptUid).some((att) => att.name == val)) return false;
       }
       return true;
+    },
+
+    applyTemplate(template: MeetingTemplate) {
+      this.msPerAttendant = template.msPerAttendant;
+      this.resetMeeting();
+      this.absentAttendants = template.names.absent.map((name) => newAttendant(name));
+      this.waitingAttendants = template.names.waiting.map((name) => newAttendant(name));
+      this.spokenAttendants = [];
+      notifyMessage('info', `Setup meeting from template \"${template.label}\"`);
+    },
+
+    setupToString(): string {
+      const waitingStr =
+        this.waitingAttendants.map((att) => att.name).join(', ') +
+        this.spokenAttendants.map((att) => att.name).join(', ');
+
+      const absentStr = this.absentAttendants.map((att) => att.name).join(', ');
+
+      return `${this.msPerAttendant};${waitingStr};${absentStr}`;
+    },
+
+    setupFromString(s: string) {
+      const [msStr, waitingSpokenStr, absentStr] = s.split(';');
+      const ms = parseInt(msStr);
+      if (isNaN(ms)) throw 'Invalid msPerAttendant in setup string!';
+      this.msPerAttendant = ms;
+
+      const waitingSpokenNames = waitingSpokenStr
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+      const absentNames = absentStr
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      this.resetMeeting();
+      this.waitingAttendants = waitingSpokenNames.map((name) => newAttendant(name));
+      this.absentAttendants = absentNames.map((name) => newAttendant(name));
     },
   },
 });
